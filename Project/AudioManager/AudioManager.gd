@@ -1,7 +1,28 @@
 extends Node2D
 
+enum Audio { BACKGROUND, WALK, JUMP, ATTACK, BLOCK, HURT, FALL }
+
+var AudioFiles = 
+{
+	Audio.BACKGROUND:"",
+	Audio.WALK:"",
+	Audio.JUMP:"",
+	Audio.ATTACK:"",
+	Audio.HURT:"",
+	Audio.FALL:"",
+}
+
+var AudioStreams = {}
+
+func _ready():
+		
+	
+	
+signal PlayAudio():
+	
+
 enum PLAYERSFX { PLAYER1, PLAYER2}
-enum STATES { WALK, JUMP, ATTACK, BLOCK, HURT, FALL }
+
 
 func PlayMusic(music_clip: AudioStream):
 	$Music/music_player.stream = music_clip
@@ -26,7 +47,7 @@ func PlaySFX( player,state):
 		_:
 			audio_file = ""	
 	
-	var audio_clip : AudioStream = load("res://Resources/Audio/test.ogg")
+	var audio_clip : AudioStream = load(audio_file)
 	match player:
 		PLAYERSFX.PLAYER1:
 			$SFX/Player1.stream = audio_clip
