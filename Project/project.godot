@@ -26,7 +26,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-AudioManager="*res://AudioManager.tscn"
+AudioDictionary="*res://AudioDictionary.tscn"
 
 [input]
 
