@@ -92,15 +92,15 @@ func ParseInput():
 		
 func ParseNavigationalInput():
 	if (Input.is_action_pressed("jump")):
-		m_DesiredState = STATE_FLAGS.JUMP
+		m_DesiredState = STATES.JUMP
 		m_DesiredDirection = PhysicsG.UP
 		print("Jump Act Pressed")
 	elif (Input.is_action_just_pressed("right")):
-		m_DesiredState = STATE_FLAGS.NAVIGATION
+		m_DesiredState = STATES.NAVIGATION
 		m_DesiredDirection = PhysicsG.RIGHT
 		print("Right Act Pressed")
 	elif (Input.is_action_just_pressed("left")):
-		m_DesiredState = STATE_FLAGS.NAVIGATION
+		m_DesiredState = STATES.NAVIGATION
 		m_DesiredDirection = PhysicsG.LEFT
 		print("Left Act Pressed")
 	else:
@@ -109,7 +109,7 @@ func ParseNavigationalInput():
 	
 func ParseAttackInput():
 	if (Input.is_action_just_pressed("attack")):
-		m_DesiredState = STATE_FLAGS.ATTACK
+		m_DesiredState = STATES.ATTACK
 		if (m_FacingRight):
 			m_DesiredDirection = PhysicsG.RIGHT
 		else:

@@ -6,7 +6,7 @@
 [node name="World" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
-position = Vector2( 50.75, -69.75 )
+position = Vector2( 55.5, -117.25 )
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource( 1 )
