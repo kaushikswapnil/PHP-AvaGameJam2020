@@ -92,6 +92,8 @@ func SM_Transition(to_state):
 	match m_State:
 		STATES.ATTACK:
 			SM_Attack_OnEnter()
+		STATES.IDLE:
+			SM_Idle_OnEnter()
 	
 	print("Transitioning to state ", m_State)
 	
@@ -107,6 +109,10 @@ func SM_Idle(delta):
 	if (!m_IsOnGround):
 		m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
+
+func SM_Idle_OnEnter():
+	$AnimationPlayer.play("player_idle")
+	
 func SM_Navigation(delta):
 	print("Player : Navigation")
 	if (m_DesiredDirection.length() == 0):
@@ -192,7 +198,7 @@ func UpdateRender(delta):
 		m_FacingRight = m_Velocity.x > 0
 		
 	if (m_FacingRight):
-		$Sprite.scale.x = -1.0
+		$hip.scale.x *= -1.0
 
 
 func _on_Timer_timeout():
