@@ -15,7 +15,6 @@ func _ready():
 	AudioStreams.ATTACK = load("res://res/Audio/test.ogg")
 	AudioStreams.BLOCK = load("res://res/Audio/test.ogg")
 	AudioStreams.HURT = load("res://res/Audio/test.ogg")
-	pass
 	
 
 	
