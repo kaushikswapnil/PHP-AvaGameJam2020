@@ -8,11 +8,13 @@ var m_DesiredDirection = Vector2(0, 0)
 enum STATES { IDLE, NAVIGATION, JUMP, ATTACK, BLOCK, HURT, FALLING, DEAD }
 var m_State = STATES.IDLE
 var m_DesiredState = STATES.IDLE
+var m_PreviousState = m_State
 var m_TimeSinceLastStateChange = 0.0
 
 var m_FacingRight = true
+var m_IsOnGround = false
 
-var frame_counter = 0;
+const JUMP_TIME = 1.2
 
 func init():
 	pass
@@ -22,73 +24,116 @@ func _ready():
 	pass # Replace with function body.
 
 func _physics_process(delta):
-	pass
+	var desired_velocity = m_Velocity
+	if (desired_velocity.y < PhysicsG.MAX_FALL_SPEED):
+		desired_velocity += PhysicsG.GRAVITY_VEC * delta
+		
+	if (m_DesiredDirection.length() > 0):
+		#add navigational velocity
+		if (m_State == STATES.NAVIGATION):
+			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
+				desired_velocity += m_DesiredDirection * min(1.0, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
+		if (m_State == STATES.JUMP):
+			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
+				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
+			desired_velocity.y -= (1.0 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
+	
+	if (m_State == STATES.IDLE):
+		if (m_Velocity.x > 0.0 && m_IsOnGround):
+			m_Velocity.x *= 0.75 #friction dampener
+		
+	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP)
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	m_DesiredDirection = Vector2(0, 0)
+	m_DesiredState = m_State
+	m_IsOnGround = m_Velocity.y == 0
 	ParseInput()
-	match m_State:
-		STATES.IDLE:
-			SM_Idle()
-		STATES.NAVIGATION:
-			SM_Navigation()
-		STATES.JUMP:
-			SM_Jump()
-		STATES.ATTACK:
-			SM_Attack()
-		STATES.BLOCK:
-			SM_Block()
-		STATES.HURT:
-			SM_Hurt()
-		STATES.FALLING:
-			SM_FALLING()
-		STATES.DEAD:
-			SM_Dead()
-		_:
-			print("Something is wrong, I can feel it")
+	Statemachine_Process(delta)
+	UpdateRender(delta)
 	
+###########################################
 # statemachine
 
+func Statemachine_Process(delta):
+	m_TimeSinceLastStateChange += delta
+	match m_State:
+		STATES.IDLE:
+			SM_Idle(delta)
+		STATES.NAVIGATION:
+			SM_Navigation(delta)
+		STATES.JUMP:
+			SM_Jump(delta)
+		STATES.ATTACK:
+			SM_Attack(delta)
+		STATES.BLOCK:
+			SM_Block(delta)
+		STATES.HURT:
+			SM_Hurt(delta)
+		STATES.FALLING:
+			SM_FALLING(delta)
+		STATES.DEAD:
+			SM_Dead(delta)
+		_:
+			print("Something is wrong, I can feel it")
+
 func SM_Transition(to_state):
+	m_PreviousState = m_State
 	m_State = to_state
+	m_TimeSinceLastStateChange = 0
 	print("Transitioning to state ", m_State)
 	
+func SM_HasPendingTransition():
+	return m_DesiredState != m_State
+	
 func SM_TransitionIfAny(to_state):
-	if (m_DesiredState != m_State):
+	if (SM_HasPendingTransition()):
 		SM_Transition(m_DesiredState)
 	
-func SM_Idle():
+func SM_Idle(delta):
 	print("Player : Idle")
+	if (!m_IsOnGround):
+		m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
-func SM_Navigation():
+func SM_Navigation(delta):
 	print("Player : Navigation")
+	if (m_DesiredDirection.length() == 0):
+		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
-func SM_Jump():
+func SM_Jump(delta):
 	print("Player : Jump")
+	m_DesiredDirection = PhysicsG.UP
+	if (m_TimeSinceLastStateChange > JUMP_TIME):
+		m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
-func SM_Block():
+func SM_Block(delta):
 	print("Player : Block")
 	SM_TransitionIfAny(m_DesiredState)
-func SM_Hurt():
+func SM_Hurt(delta):
 	print("Player : Hurt")
 	SM_TransitionIfAny(m_DesiredState)
-func SM_FALLING():
+func SM_FALLING(delta):
 	print("Player : Falling")
+	if (!SM_HasPendingTransition() && m_IsOnGround):
+		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
-func SM_Dead():
+func SM_Dead(delta):
 	print("Player : Dead")
 	SM_TransitionIfAny(m_DesiredState)
-func SM_Attack():
+func SM_Attack(delta):
 	print("Player : Attack")
 	SM_TransitionIfAny(m_DesiredState)
 	
+###########################################
+# input
+#
 func ParseInput():
 	if (ParseNavigationalInput()):
-		return
+		return true
 	elif (ParseAttackInput()):
-		return
-	return 
+		return true
+	return false
 		
 func ParseNavigationalInput():
 	if (Input.is_action_pressed("jump")):
@@ -118,4 +163,13 @@ func ParseAttackInput():
 		return true
 		
 	return false
+	
+###########################################
+# Render
+
+func UpdateRender(delta):
+	if (abs(m_Velocity.x) > 0):
+		m_FacingRight = m_Velocity.x > 0
 		
+	if (m_FacingRight):
+		$Sprite.scale.x = -1.0
