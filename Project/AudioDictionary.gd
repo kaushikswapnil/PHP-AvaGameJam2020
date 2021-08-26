@@ -13,7 +13,7 @@ func _ready():
 	AudioStreams.WALK = load("res://res/Audio/test.ogg")
 	AudioStreams.JUMP = load("res://res/Audio/test.ogg")
 	AudioStreams.ATTACK = load("res://res/Audio/test.ogg")
-	AudioStreams.BLOCK = load("res://res/Audio/test.ogg"
+	AudioStreams.BLOCK = load("res://res/Audio/test.ogg")
 	AudioStreams.HURT = load("res://res/Audio/test.ogg")
 	pass
 	
