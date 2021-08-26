@@ -1,5 +1,7 @@
 extends KinematicBody2D
 
+class_name Player
+
 const PhysicsG = preload("res://physics_globals.gd")
 
 var m_Velocity = Vector2(0, 0)
@@ -14,29 +16,34 @@ var m_TimeSinceLastStateChange = 0.0
 var m_FacingRight = true
 var m_IsOnGround = false
 
+var m_CanFire = true
+
 const JUMP_TIME = 1.2
+
+export var PlatformRes : PackedScene
 
 func init():
 	pass
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	AudioManager.PlaySFX(AudioManager.PLAYERSFX.PLAYER2,AudioManager.STATES.ATTACK)
 	pass # Replace with function body.
 
 func _physics_process(delta):
 	var desired_velocity = m_Velocity
-	if (desired_velocity.y < PhysicsG.MAX_FALL_SPEED):
-		desired_velocity += PhysicsG.GRAVITY_VEC * delta
+	if (desired_velocity.y < PhysicsG.MAX_FALL_SPEED && m_State != STATES.JUMP):
+		desired_velocity += PhysicsG.GRAVITY_VEC
 		
 	if (m_DesiredDirection.length() > 0):
 		#add navigational velocity
 		if (m_State == STATES.NAVIGATION):
 			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
-				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
+				desired_velocity += m_DesiredDirection * min(1.0, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
 		if (m_State == STATES.JUMP):
 			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
 				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
-			desired_velocity.y -= (0.2 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
+			desired_velocity.y -= (2.0 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
 	
 	if (m_State == STATES.IDLE):
 		if (m_Velocity.x > 0.0 && m_IsOnGround):
@@ -82,6 +89,11 @@ func SM_Transition(to_state):
 	m_PreviousState = m_State
 	m_State = to_state
 	m_TimeSinceLastStateChange = 0
+	
+	match m_State:
+		STATES.ATTACK:
+			SM_Attack_OnEnter()
+	
 	print("Transitioning to state ", m_State)
 	
 func SM_HasPendingTransition():
@@ -104,7 +116,7 @@ func SM_Navigation(delta):
 func SM_Jump(delta):
 	print("Player : Jump")
 	m_DesiredDirection = PhysicsG.UP
-	if (m_TimeSinceLastStateChange > JUMP_TIME):
+	if (m_TimeSinceLastStateChange >= JUMP_TIME):
 		m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
 func SM_Block(delta):
@@ -123,15 +135,24 @@ func SM_Dead(delta):
 	SM_TransitionIfAny(m_DesiredState)
 func SM_Attack(delta):
 	print("Player : Attack")
+	if(m_TimeSinceLastStateChange > 10.0):
+		m_DesiredState = STATES.IDLE	
 	SM_TransitionIfAny(m_DesiredState)
+		
+func SM_Attack_OnEnter():
+	var new_platform_position = global_position + (m_DesiredDirection + Vector2(sign(m_DesiredDirection.x) * 3.0, -3.0))
+	var new_platform = PlatformRes.instance()
+	new_platform.position = new_platform_position
+	add_child(new_platform)
+		
 	
 ###########################################
 # input
 #
 func ParseInput():
-	if (ParseNavigationalInput()):
+	if (ParseAttackInput()):
 		return true
-	elif (ParseAttackInput()):
+	elif (ParseNavigationalInput()):
 		return true
 	return false
 		
@@ -140,11 +161,11 @@ func ParseNavigationalInput():
 		m_DesiredState = STATES.JUMP
 		m_DesiredDirection = PhysicsG.UP
 		print("Jump Act Pressed")
-	elif (Input.is_action_just_pressed("right")):
+	elif (Input.is_action_pressed("right")):
 		m_DesiredState = STATES.NAVIGATION
 		m_DesiredDirection = PhysicsG.RIGHT
 		print("Right Act Pressed")
-	elif (Input.is_action_just_pressed("left")):
+	elif (Input.is_action_pressed("left")):
 		m_DesiredState = STATES.NAVIGATION
 		m_DesiredDirection = PhysicsG.LEFT
 		print("Left Act Pressed")
@@ -173,3 +194,7 @@ func UpdateRender(delta):
 		
 	if (m_FacingRight):
 		$Sprite.scale.x = -1.0
+
+
+func _on_Timer_timeout():
+	m_CanFire = true
