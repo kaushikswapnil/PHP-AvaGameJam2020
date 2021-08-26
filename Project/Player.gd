@@ -27,7 +27,6 @@ func init():
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	AudioManager.PlaySFX(AudioManager.PLAYERSFX.PLAYER2,AudioManager.STATES.ATTACK)
 	pass # Replace with function body.
 
 func _physics_process(delta):
