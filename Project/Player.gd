@@ -43,10 +43,11 @@ func _physics_process(delta):
 			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
 				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
 			desired_velocity.y -= (2.0 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
-	
-	if (m_State == STATES.IDLE):
-		if (m_Velocity.x > 0.0 && m_IsOnGround):
-			m_Velocity.x *= 0.75 #friction dampener
+	elif (m_Velocity.x > 0.0 && m_IsOnGround):
+		if (abs(m_Velocity.x) < 0.01):
+			m_Velocity = 0.0
+		else:
+			m_Velocity.x *= 0.5 #friction dampener			
 		
 	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP)
 	m_IsOnGround = m_Velocity.y == 0
@@ -115,29 +116,37 @@ func SM_Idle_OnEnter():
 	
 func SM_Navigation(delta):
 	print("Player : Navigation")
-	if (m_DesiredDirection.length() == 0):
+	if (m_DesiredDirection.length() == 0.0 && m_Velocity.length() < 0.1):
+		m_Velocity = Vector2(0.0, 0.0)
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
+	
 func SM_Jump(delta):
 	print("Player : Jump")
 	m_DesiredDirection = PhysicsG.UP
 	if (m_TimeSinceLastStateChange >= JUMP_TIME):
 		m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
+	
 func SM_Block(delta):
 	print("Player : Block")
 	SM_TransitionIfAny(m_DesiredState)
+	
 func SM_Hurt(delta):
 	print("Player : Hurt")
 	SM_TransitionIfAny(m_DesiredState)
+	
 func SM_FALLING(delta):
 	print("Player : Falling")
 	if (!SM_HasPendingTransition() && m_IsOnGround):
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
+	
 func SM_Dead(delta):
 	print("Player : Dead")
 	SM_TransitionIfAny(m_DesiredState)
+	
+	
 func SM_Attack(delta):
 	print("Player : Attack")
 	if(m_TimeSinceLastStateChange > 10.0):
@@ -203,3 +212,7 @@ func UpdateRender(delta):
 
 func _on_Timer_timeout():
 	m_CanFire = true
+	
+###########################################
+# Sound
+
