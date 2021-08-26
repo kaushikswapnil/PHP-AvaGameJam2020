@@ -5,9 +5,9 @@ const PhysicsG = preload("res://physics_globals.gd")
 var m_Velocity = Vector2(0, 0)
 var m_DesiredDirection = Vector2(0, 0)
 
-enum STATE_FLAGS { IDLE, NAVIGATION, JUMP, ATTACK, BLOCK, HURT, FALLING, DEAD }
-var m_State = STATE_FLAGS.IDLE
-var m_DesiredState = STATE_FLAGS.IDLE
+enum STATES { IDLE, NAVIGATION, JUMP, ATTACK, BLOCK, HURT, FALLING, DEAD }
+var m_State = STATES.IDLE
+var m_DesiredState = STATES.IDLE
 var m_TimeSinceLastStateChange = 0.0
 
 var m_FacingRight = true
@@ -26,26 +26,62 @@ func _physics_process(delta):
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	m_DesiredDirection = Vector2(0, 0)
 	ParseInput()
+	match m_State:
+		STATES.IDLE:
+			SM_Idle()
+		STATES.NAVIGATION:
+			SM_Navigation()
+		STATES.JUMP:
+			SM_Jump()
+		STATES.ATTACK:
+			SM_Attack()
+		STATES.BLOCK:
+			SM_Block()
+		STATES.HURT:
+			SM_Hurt()
+		STATES.FALLING:
+			SM_FALLING()
+		STATES.DEAD:
+			SM_Dead()
+		_:
+			print("Something is wrong, I can feel it")
 	
 # statemachine
 
+func SM_Transition(to_state):
+	m_State = to_state
+	print("Transitioning to state ", m_State)
+	
+func SM_TransitionIfAny(to_state):
+	if (m_DesiredState != m_State):
+		SM_Transition(m_DesiredState)
+	
 func SM_Idle():
-	pass
+	print("Player : Idle")
+	SM_TransitionIfAny(m_DesiredState)
 func SM_Navigation():
-	pass
+	print("Player : Navigation")
+	SM_TransitionIfAny(m_DesiredState)
 func SM_Jump():
-	pass
+	print("Player : Jump")
+	SM_TransitionIfAny(m_DesiredState)
 func SM_Block():
-	pass
+	print("Player : Block")
+	SM_TransitionIfAny(m_DesiredState)
 func SM_Hurt():
-	pass
+	print("Player : Hurt")
+	SM_TransitionIfAny(m_DesiredState)
 func SM_FALLING():
-	pass
+	print("Player : Falling")
+	SM_TransitionIfAny(m_DesiredState)
 func SM_Dead():
-	pass
+	print("Player : Dead")
+	SM_TransitionIfAny(m_DesiredState)
 func SM_Attack():
-	pass
+	print("Player : Attack")
+	SM_TransitionIfAny(m_DesiredState)
 	
 func ParseInput():
 	if (ParseNavigationalInput()):
