@@ -32,23 +32,23 @@ func _physics_process(delta):
 		#add navigational velocity
 		if (m_State == STATES.NAVIGATION):
 			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
-				desired_velocity += m_DesiredDirection * min(1.0, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
+				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
 		if (m_State == STATES.JUMP):
 			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
 				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
-			desired_velocity.y -= (1.0 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
+			desired_velocity.y -= (0.2 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
 	
 	if (m_State == STATES.IDLE):
 		if (m_Velocity.x > 0.0 && m_IsOnGround):
 			m_Velocity.x *= 0.75 #friction dampener
 		
 	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP)
+	m_IsOnGround = m_Velocity.y == 0
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	m_DesiredDirection = Vector2(0, 0)
 	m_DesiredState = m_State
-	m_IsOnGround = m_Velocity.y == 0
 	ParseInput()
 	Statemachine_Process(delta)
 	UpdateRender(delta)
@@ -136,7 +136,7 @@ func ParseInput():
 	return false
 		
 func ParseNavigationalInput():
-	if (Input.is_action_pressed("jump")):
+	if (Input.is_action_pressed("jump") && m_IsOnGround):
 		m_DesiredState = STATES.JUMP
 		m_DesiredDirection = PhysicsG.UP
 		print("Jump Act Pressed")
