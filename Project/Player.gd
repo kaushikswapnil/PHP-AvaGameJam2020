@@ -22,8 +22,8 @@ const JUMP_TIME = 1.2
 
 export var PlatformRes : PackedScene
 
-func init():
-	pass
+func init(device):
+	m_OwnedDevice = device
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -54,8 +54,6 @@ func _physics_process(delta):
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	m_DesiredDirection = Vector2(0, 0)
-	m_DesiredState = m_State
 	ParseInput()
 	Statemachine_Process(delta)
 	UpdateRender(delta)
@@ -156,18 +154,63 @@ func SM_Attack(delta):
 func SM_Attack_OnEnter():
 	var new_platform_position = global_position + (m_DesiredDirection + Vector2(sign(m_DesiredDirection.x) * 3.0, -3.0))
 	var new_platform = PlatformRes.instance()
-	new_platform.position = new_platform_position
 	add_child(new_platform)
+	new_platform.position = new_platform_position
 		
 	
 ###########################################
 # input
 #
+onready var m_OwnedDevice = InvalidDevice
+const InvalidDevice = -1
+
+func _input(event):
+	if (event.device != m_OwnedDevice || event is InputEventMouseButton || event is InputEventMouseMotion):
+		return
+		
+	if (ParseAttackInput_E(event)):
+		return 
+	elif (ParseNavigationalInput_E(event)):
+		return 
+	return 
+
 func ParseInput():
+	if (m_OwnedDevice != InvalidDevice):
+		return #Only parse input here if we dont own a device 
+	
 	if (ParseAttackInput()):
 		return true
 	elif (ParseNavigationalInput()):
 		return true
+	return false
+
+func ParseNavigationalInput_E(event):
+	if (event.is_action_pressed("jump") && m_IsOnGround):
+		m_DesiredState = STATES.JUMP
+		m_DesiredDirection = PhysicsG.UP
+		print("Jump Act Pressed")
+	elif (event.is_action_pressed("right")):
+		m_DesiredState = STATES.NAVIGATION
+		m_DesiredDirection = PhysicsG.RIGHT
+		print("Right Act Pressed")
+	elif (event.is_action_pressed("left")):
+		m_DesiredState = STATES.NAVIGATION
+		m_DesiredDirection = PhysicsG.LEFT
+		print("Left Act Pressed")
+	else:
+		return false
+	return true
+	
+func ParseAttackInput_E(event):
+	if (event.is_action_pressed("attack")):
+		m_DesiredState = STATES.ATTACK
+		if (m_FacingRight):
+			m_DesiredDirection = PhysicsG.RIGHT
+		else:
+			m_DesiredDirection = PhysicsG.LEFT
+		print("Attack Act Pressed")
+		return true
+		
 	return false
 		
 func ParseNavigationalInput():
