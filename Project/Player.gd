@@ -49,7 +49,7 @@ func _physics_process(delta):
 			desired_velocity.y -= (2.0 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
 	elif (abs(desired_velocity.x) > 0.0 && m_IsOnGround):
 		if (abs(desired_velocity.x) < 0.01):
-			desired_velocity = 0.0
+			desired_velocity = PhysicsG.NULL_VECTOR
 		else:
 			desired_velocity.x = max(0.0, abs(desired_velocity.x) - min(2.0, 0.5 * abs(desired_velocity.x))) * sign(desired_velocity.x)
 		
@@ -174,7 +174,12 @@ func SM_Attack(delta):
 		
 func SM_Attack_OnEnter():
 	m_AttackCompleted = false
-	emit_signal("s_PlayAnimation", "player_attack")
+	if (m_DesiredDirection == PhysicsG.RIGHT):
+		emit_signal("s_PlayAnimation", "player_attack_1")
+	elif (m_DesiredDirection == PhysicsG.UP):
+		emit_signal("s_PlayAnimation", "player_attack_2")
+	elif (m_DesiredDirection == PhysicsG.DOWN):
+		emit_signal("s_PlayAnimation", "player_attack_3")
 	$PlayerAnimator.connect("animation_finished", self, "SM_OnAttackAnimation_Ended")
 	
 func SM_OnAttackAnimation_Ended(anim_name):
@@ -182,10 +187,20 @@ func SM_OnAttackAnimation_Ended(anim_name):
 	var facing = Vector2(1.0, 0.0)
 	if !m_FacingRight:
 		facing *= -1.0
-	var new_platform_position = global_position + facing + Vector2(0.0, 3.0)
+	var new_platform_position = global_position
+	var rotation_degree = rotation_degrees
+	if anim_name == "player_attack_1":
+		new_platform_position += (facing * 15.5) + Vector2(0.0, -3.5)
+	elif anim_name == "player_attack_2":
+		new_platform_position += (facing * 5.5) + Vector2(0.0, -12.0)
+		rotation_degree += 45.0
+	elif anim_name == "player_attack_3":
+		new_platform_position += (facing * 3.5) + Vector2(0.0, 12.5)
+		rotation_degree -= 45.0
 	var new_platform = PlatformRes.instance()
 	get_parent().add_child(new_platform)
 	new_platform.position = new_platform_position
+	new_platform.rotation_degrees = rotation_degree
 	$PlayerAnimator.disconnect("animation_finished", self, "SM_OnAttackAnimation_Ended")
 	
 ###########################################
@@ -263,14 +278,15 @@ func ParseNavigationalInput_E(event):
 	
 func ParseAttackInput_E(event):
 	if (event.is_action_pressed("attack")):
-		if (m_FacingRight):
-			m_InputsToProcess.append([STATES.ATTACK, PhysicsG.RIGHT])
-		else:
-			m_InputsToProcess.append([STATES.ATTACK, PhysicsG.LEFT])
-		print("Attack Act Pressed")
-		return true
+		m_InputsToProcess.append([STATES.ATTACK, PhysicsG.RIGHT])
+	elif (event.is_action_pressed("attack2")):
+		m_InputsToProcess.append([STATES.ATTACK, PhysicsG.UP])
+	elif (event.is_action_pressed("attack3")):
+		m_InputsToProcess.append([STATES.ATTACK, PhysicsG.DOWN])
+	else:
+		return false
 		
-	return false
+	return true
 		
 func ParseNavigationalInput():
 	if (Input.is_action_pressed("jump") && m_IsOnGround):
