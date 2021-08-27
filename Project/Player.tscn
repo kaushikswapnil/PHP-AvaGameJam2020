@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://Player.gd" type="Script" id=1]
 [ext_resource path="res://res/arm.png" type="Texture" id=2]
@@ -16,6 +16,7 @@
 [ext_resource path="res://res/viking2.png" type="Texture" id=14]
 [ext_resource path="res://PlayerAnimator.gd" type="Script" id=15]
 [ext_resource path="res://Weapon.tscn" type="PackedScene" id=16]
+[ext_resource path="res://Platform.tscn" type="PackedScene" id=17]
 
 [sub_resource type="CapsuleShape2D" id=1]
 height = 30.0
@@ -2270,7 +2271,7 @@ tracks/45/keys = {
 
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 1 )
-PlatformRes = ExtResource( 3 )
+PlatformRes = ExtResource( 17 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, 1.48651 )
