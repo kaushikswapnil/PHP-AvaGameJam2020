@@ -20,7 +20,7 @@
 [sub_resource type="CapsuleShape2D" id=1]
 height = 30.0
 
-[sub_resource type="Animation" id=7]
+[sub_resource type="Animation" id=2]
 length = 1.6
 tracks/0/type = "value"
 tracks/0/path = NodePath("hip/abdomen/chest/arm_left/forearm_left/hand_left/end:position")
@@ -575,7 +575,7 @@ tracks/45/keys = {
 "values": [ -0.972054, -0.972054 ]
 }
 
-[sub_resource type="Animation" id=8]
+[sub_resource type="Animation" id=3]
 resource_name = "player_attack_1"
 length = 0.25
 step = 0.0166667
@@ -1161,7 +1161,7 @@ tracks/47/keys = {
 } ]
 }
 
-[sub_resource type="Animation" id=9]
+[sub_resource type="Animation" id=4]
 resource_name = "player_attack_2"
 length = 0.166667
 step = 0.0166667
@@ -1747,7 +1747,7 @@ tracks/47/keys = {
 } ]
 }
 
-[sub_resource type="Animation" id=10]
+[sub_resource type="Animation" id=5]
 step = 0.25
 tracks/0/type = "value"
 tracks/0/path = NodePath("hip/abdomen/chest/arm_left/forearm_left/hand_left/end:rotation_degrees")
@@ -2324,7 +2324,7 @@ tracks/47/keys = {
 "values": [ -190.0 ]
 }
 
-[sub_resource type="Animation" id=11]
+[sub_resource type="Animation" id=6]
 length = 0.25
 step = 0.0166667
 tracks/0/type = "value"
@@ -2903,8 +2903,7 @@ tracks/47/keys = {
 "values": [  ]
 }
 
-[sub_resource type="Animation" id=5]
-resource_name = "player_jump"
+[sub_resource type="Animation" id=7]
 length = 0.166667
 step = 0.0166667
 tracks/0/type = "value"
@@ -3460,8 +3459,7 @@ tracks/45/keys = {
 "values": [ -0.972054, -0.972054 ]
 }
 
-[sub_resource type="Animation" id=6]
-resource_name = "player_walk"
+[sub_resource type="Animation" id=8]
 length = 1.2
 loop = true
 step = 0.2
@@ -4030,7 +4028,7 @@ tracks/46/keys = {
 "values": [  ]
 }
 
-[sub_resource type="Animation" id=12]
+[sub_resource type="Animation" id=9]
 length = 1.6
 tracks/0/type = "value"
 tracks/0/path = NodePath("hip/abdomen/chest/arm_left/forearm_left/hand_left/end:position")
@@ -4596,7 +4594,7 @@ tracks/46/keys = {
 "values": [  ]
 }
 
-[sub_resource type="Animation" id=13]
+[sub_resource type="Animation" id=10]
 length = 1.2
 step = 0.2
 tracks/0/type = "value"
@@ -5152,7 +5150,7 @@ tracks/45/keys = {
 "values": [ 50.7427, 31.5034, 66.7939, 86.5323 ]
 }
 
-[sub_resource type="Animation" id=14]
+[sub_resource type="Animation" id=11]
 length = 0.166667
 step = 0.0166667
 tracks/0/type = "value"
@@ -5721,6 +5719,7 @@ tracks/46/keys = {
 }
 
 [node name="Player" type="KinematicBody2D"]
+collision_mask = 3
 script = ExtResource( 1 )
 PlatformRes = ExtResource( 17 )
 
@@ -5934,16 +5933,16 @@ __meta__ = {
 }
 
 [node name="PlayerAnimator" type="AnimationPlayer" parent="."]
-anims/player_attack = SubResource( 7 )
-anims/player_attack_1 = SubResource( 8 )
-anims/player_attack_2 = SubResource( 9 )
-anims/player_attack_3 = SubResource( 10 )
-anims/player_block = SubResource( 11 )
-anims/player_crouch = SubResource( 5 )
-anims/player_idle = SubResource( 6 )
-anims/player_jump = SubResource( 12 )
-anims/player_walk = SubResource( 13 )
-anims/player_win = SubResource( 14 )
+anims/player_attack = SubResource( 2 )
+anims/player_attack_1 = SubResource( 3 )
+anims/player_attack_2 = SubResource( 4 )
+anims/player_attack_3 = SubResource( 5 )
+anims/player_block = SubResource( 6 )
+anims/player_crouch = SubResource( 7 )
+anims/player_idle = SubResource( 8 )
+anims/player_jump = SubResource( 9 )
+anims/player_walk = SubResource( 10 )
+anims/player_win = SubResource( 11 )
 script = ExtResource( 15 )
 
 [node name="Timer" type="Timer" parent="."]

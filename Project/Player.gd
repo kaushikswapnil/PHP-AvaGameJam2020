@@ -165,6 +165,7 @@ func SM_Dead(delta):
 	print("Player : Dead")
 	SM_TransitionIfAny(m_DesiredState)
 	
+onready var m_Weapon = $hip/abdomen/chest/arm_right/forearm_right/hand_right/weapon_slot/Weapon
 var m_AttackCompleted = false
 func SM_Attack(delta):
 	print("Player : Attack")
@@ -181,6 +182,10 @@ func SM_Attack_OnEnter():
 	elif (m_DesiredDirection == PhysicsG.DOWN):
 		emit_signal("s_PlayAnimation", "player_attack_3")
 	$PlayerAnimator.connect("animation_finished", self, "SM_OnAttackAnimation_Ended")
+	m_Weapon.connect("OnDamageInflicted", self, "SM_OnAttack_TargetHit")
+	
+func SM_OnAttack_TargetHit(damage, body):
+	m_Weapon.disconnect("OnDamageInflicted", self, "SM_OnAttack_TargetHit")
 	
 func SM_OnAttackAnimation_Ended(anim_name):
 	m_AttackCompleted = true

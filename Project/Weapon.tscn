@@ -9,6 +9,7 @@ extents = Vector2( 1.2233, 11.0426 )
 [node name="Weapon" type="Area2D"]
 monitoring = false
 monitorable = false
+collision_layer = 4
 script = ExtResource( 1 )
 OnHitDamage = 30
 
