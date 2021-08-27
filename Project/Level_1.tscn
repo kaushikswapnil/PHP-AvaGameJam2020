@@ -1,4 +1,4 @@
-[gd_scene load_steps=119 format=2]
+[gd_scene load_steps=121 format=2]
 
 [ext_resource path="res://addons/rmsmartshape/shapes/point.gd" type="Script" id=1]
 [ext_resource path="res://addons/rmsmartshape/shapes/point_array.gd" type="Script" id=2]
@@ -6,6 +6,8 @@
 [ext_resource path="res://addons/rmsmartshape/vertex_properties.gd" type="Script" id=4]
 [ext_resource path="res://addons/rmsmartshape/shapes/shape_closed.gd" type="Script" id=5]
 [ext_resource path="res://res/Textures/BlackTexture.png" type="Texture" id=6]
+[ext_resource path="res://res/Textures/light.png" type="Texture" id=7]
+[ext_resource path="res://res/Textures/spot.png" type="Texture" id=8]
 
 [sub_resource type="Resource" id=1]
 script = ExtResource( 3 )
@@ -799,9 +801,19 @@ _next_key = 55
 [node name="Level_1" type="Node2D"]
 
 [node name="SS2D_Shape_Closed" type="Node2D" parent="."]
-position = Vector2( 1, 0 )
+position = Vector2( 78.3624, 31.9541 )
 script = ExtResource( 5 )
 shape_material = SubResource( 1 )
 _points = SubResource( 112 )
 material_overrides = {
 }
+
+[node name="Light2D" type="Light2D" parent="SS2D_Shape_Closed"]
+position = Vector2( 396.903, 40.363 )
+scale = Vector2( 0.87962, 1 )
+texture = ExtResource( 7 )
+
+[node name="Sprite" type="Sprite" parent="SS2D_Shape_Closed/Light2D"]
+position = Vector2( -9.55981, -5.04538 )
+scale = Vector2( -4.78796, 1.93446 )
+texture = ExtResource( 8 )
