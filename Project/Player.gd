@@ -2,6 +2,9 @@ extends KinematicBody2D
 
 class_name Player
 
+signal s_PlayAudio(audio_res)
+signal s_PlayAnimation(animation_track)
+
 const PhysicsG = preload("res://physics_globals.gd")
 
 var m_Velocity = Vector2(0, 0)
@@ -93,6 +96,10 @@ func SM_Transition(to_state):
 			SM_Attack_OnEnter()
 		STATES.IDLE:
 			SM_Idle_OnEnter()
+		STATES.NAVIGATION:
+			SM_Navigation_OnEnter()
+		STATES.JUMP:
+			SM_Jump_OnEnter()
 	
 	print("Transitioning to state ", m_State)
 	
@@ -110,7 +117,7 @@ func SM_Idle(delta):
 	SM_TransitionIfAny(m_DesiredState)
 
 func SM_Idle_OnEnter():
-	$AnimationPlayer.play("player_idle")
+	emit_signal("s_PlayAnimation", "player_idle")
 	
 func SM_Navigation(delta):
 	print("Player : Navigation")
@@ -119,12 +126,18 @@ func SM_Navigation(delta):
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
 	
+func SM_Navigation_OnEnter():
+	emit_signal("s_PlayAnimation", "player_walk")
+	
 func SM_Jump(delta):
 	print("Player : Jump")
 	m_DesiredDirection = PhysicsG.UP
 	if (m_TimeSinceLastStateChange >= JUMP_TIME):
 		m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
+	
+func SM_Jump_OnEnter():
+	emit_signal("s_PlayAnimation", "player_jump")
 	
 func SM_Block(delta):
 	print("Player : Block")
@@ -152,6 +165,7 @@ func SM_Attack(delta):
 	SM_TransitionIfAny(m_DesiredState)
 		
 func SM_Attack_OnEnter():
+	emit_signal("s_PlayAnimation", "player_attack")
 	var new_platform_position = global_position + (m_DesiredDirection + Vector2(sign(m_DesiredDirection.x) * 3.0, -3.0))
 	var new_platform = PlatformRes.instance()
 	add_child(new_platform)
