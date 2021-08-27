@@ -190,13 +190,13 @@ func SM_OnAttackAnimation_Ended(anim_name):
 	var new_platform_position = global_position
 	var rotation_degree = rotation_degrees
 	if anim_name == "player_attack_1":
-		new_platform_position += (facing * 15.5) + Vector2(0.0, -3.5)
+		new_platform_position += (facing * 35.5) + Vector2(0.0, -3.5)
 	elif anim_name == "player_attack_2":
-		new_platform_position += (facing * 5.5) + Vector2(0.0, -12.0)
-		rotation_degree += 45.0
+		new_platform_position += (facing * 5.5) + Vector2(0.0, -24.0)
+		rotation_degree += 30.0
 	elif anim_name == "player_attack_3":
-		new_platform_position += (facing * 3.5) + Vector2(0.0, 12.5)
-		rotation_degree -= 45.0
+		new_platform_position += (facing * 3.5) + Vector2(0.0, 30.5)
+		rotation_degree -= 30.0
 	var new_platform = PlatformRes.instance()
 	get_parent().add_child(new_platform)
 	new_platform.position = new_platform_position
