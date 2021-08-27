@@ -188,10 +188,14 @@ func SM_OnAttackAnimation_Ended(anim_name):
 # input
 #
 onready var m_OwnedDevice = InvalidDevice
-const InvalidDevice = -1
+const KeyBoard = -1
+const InvalidDevice = -2
 
 func _input(event):
-	if (event.device != m_OwnedDevice || event is InputEventMouseButton || event is InputEventMouseMotion):
+	if (event is InputEventMouseButton || event is InputEventMouseMotion):
+		return
+	
+	if (m_OwnedDevice == KeyBoard && !(event is InputEventKey)):
 		return
 		
 	if (ParseAttackInput_E(event)):

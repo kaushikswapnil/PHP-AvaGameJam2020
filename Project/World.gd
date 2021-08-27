@@ -7,7 +7,7 @@ var m_Players = []
 func _ready():
 	Input.connect("joy_connection_changed", self, "_on_joy_connection_changed")
 	m_Players = []
-	AddPlayer(0, false, Color(0, 0, 0))
+	AddPlayer(-1, false, Color(0, 0, 0))
 	var connected_pads = Input.get_connected_joypads()
 	for x in connected_pads:
 		AddPlayer(x, true, Color(rand_range(0.0, 1.0), rand_range(0.0, 1.0), rand_range(0.0, 1.0)))
@@ -33,8 +33,8 @@ func AddPlayer(device, randomize_pos, color):
 	new_player.init(device, color)
 	
 func RemovePlayer(device):
-	for p in m_Players:
-		if (p.m_OwnedDevice == device):
-			remove_child(p)
+	for p in range(m_Players.size()):
+		if (m_Players[p].m_OwnedDevice == device):
+			remove_child(m_Players[p])
 			m_Players.remove(p)
 			break
