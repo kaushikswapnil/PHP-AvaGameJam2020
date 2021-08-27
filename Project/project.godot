@@ -160,6 +160,10 @@ AudioManager="*res://AudioManager.tscn"
 settings/fps/force_fps=60
 settings/stdout/print_fps=true
 
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/rmsmartshape/plugin.cfg" )
+
 [input]
 
 right={
