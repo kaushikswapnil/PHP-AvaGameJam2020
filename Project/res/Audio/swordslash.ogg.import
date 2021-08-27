@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/swordslash.ogg-e794c67a2419f43c91e8c8772023defa.oggstr"
+
+[deps]
+
+source_file="res://res/Audio/swordslash.ogg"
+dest_files=[ "res://.import/swordslash.ogg-e794c67a2419f43c91e8c8772023defa.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

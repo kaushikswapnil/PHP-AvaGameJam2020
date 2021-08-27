@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/hurt.ogg-428923b5c6bd52812f188071adf8ca69.oggstr"
+
+[deps]
+
+source_file="res://res/Audio/hurt.ogg"
+dest_files=[ "res://.import/hurt.ogg-428923b5c6bd52812f188071adf8ca69.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0
