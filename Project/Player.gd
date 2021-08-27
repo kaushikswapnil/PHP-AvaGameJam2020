@@ -44,17 +44,16 @@ func _physics_process(delta):
 			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
 				desired_velocity += m_DesiredDirection * min(1.0, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
 		if (m_State == STATES.JUMP):
-			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
+			if (abs(desired_velocity.x) < PhysicsG.MAX_SPEED):
 				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
 			desired_velocity.y -= (2.0 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
-	elif (abs(m_Velocity.x) > 0.0 && m_IsOnGround):
-		if (abs(m_Velocity.x) < 0.01):
-			m_Velocity = 0.0
+	elif (abs(desired_velocity.x) > 0.0 && m_IsOnGround):
+		if (abs(desired_velocity.x) < 0.01):
+			desired_velocity = 0.0
 		else:
-			m_Velocity.x *= 0.5 #friction dampener			
+			desired_velocity.x = max(0.0, abs(desired_velocity.x) - min(2.0, 0.5 * abs(desired_velocity.x))) * sign(desired_velocity.x)
 		
 	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP)
-	m_DesiredDirection = Vector2(0, 0)
 	m_IsOnGround = m_Velocity.y == 0
 	m_FacingRight = m_Velocity.x > 0
 	
@@ -130,7 +129,7 @@ func SM_Idle_OnEnter():
 	
 func SM_Navigation(delta):
 	print("Player : Navigation")
-	if (m_TimeSinceLastNavigationalInput > 2 * delta && m_Velocity.length() < 0.1):
+	if (!m_InputsProcessedThisFrame && m_Velocity.length() < 0.01):
 		m_Velocity = Vector2(0.0, 0.0)
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
@@ -177,13 +176,17 @@ func SM_Attack_OnEnter():
 	m_AttackCompleted = false
 	emit_signal("s_PlayAnimation", "player_attack")
 	$PlayerAnimator.connect("animation_finished", self, "SM_OnAttackAnimation_Ended")
-	var new_platform_position = global_position + (m_DesiredDirection + Vector2(sign(m_DesiredDirection.x) * 3.0, -3.0))
-	var new_platform = PlatformRes.instance()
-	add_child(new_platform)
-	new_platform.position = new_platform_position
 	
 func SM_OnAttackAnimation_Ended(anim_name):
 	m_AttackCompleted = true
+	var facing = Vector2(1.0, 0.0)
+	if !m_FacingRight:
+		facing *= -1.0
+	var new_platform_position = global_position + facing + Vector2(0.0, 3.0)
+	var new_platform = PlatformRes.instance()
+	get_parent().add_child(new_platform)
+	new_platform.position = new_platform_position
+	$PlayerAnimator.disconnect("animation_finished", self, "SM_OnAttackAnimation_Ended")
 	
 ###########################################
 # input
@@ -192,7 +195,10 @@ onready var m_OwnedDevice = InvalidDevice
 const KeyBoard = -1
 const InvalidDevice = -2
 onready var m_TimeSinceLastInput = 0
-onready var m_TimeSinceLastNavigationalInput = 0
+onready var m_TimeSinceLastNavigationalInput = 0.0
+onready var m_InputsProcessedThisFrame = false
+
+onready var m_InputsToProcess = []
 
 func _input(event):
 	if (event is InputEventMouseButton || event is InputEventMouseMotion):
@@ -211,44 +217,56 @@ func _input(event):
 func ParseInput(delta):
 	m_TimeSinceLastInput += delta
 	m_TimeSinceLastNavigationalInput += delta
+	m_InputsProcessedThisFrame = false
 	
 	if (m_OwnedDevice != InvalidDevice):
+		if (m_InputsToProcess.size() > 0):
+			var x = m_InputsToProcess.back()
+			m_DesiredState = x[0]
+			m_DesiredDirection = x[1]
+			m_InputsToProcess.clear()
+			m_InputsProcessedThisFrame = true
+		else:
+			m_DesiredState = m_State
+			if (m_State != STATES.NAVIGATION):
+				m_DesiredDirection = Vector2(0, 0)
 		return #Only parse input here if we dont own a device 
 	
 	if (ParseAttackInput()):
 		m_TimeSinceLastInput = 0
+		m_InputsProcessedThisFrame = true
 		return true
 	elif (ParseNavigationalInput()):
 		m_TimeSinceLastInput = 0
 		m_TimeSinceLastNavigationalInput
+		m_InputsProcessedThisFrame = true
 		return true
 	return false
 
 func ParseNavigationalInput_E(event):
 	if (m_IsOnGround):
 		if (event.is_action_pressed("jump")):
-			m_DesiredState = STATES.JUMP
-			m_DesiredDirection = PhysicsG.UP
+			m_InputsToProcess.append([STATES.JUMP, PhysicsG.UP])
 			print("Jump Act Pressed")
 		elif (event.is_action_pressed("right")):
-			m_DesiredState = STATES.NAVIGATION
-			m_DesiredDirection = PhysicsG.RIGHT
+			m_InputsToProcess.append([STATES.NAVIGATION, PhysicsG.RIGHT])
 			print("Right Act Pressed")
 		elif (event.is_action_pressed("left")):
-			m_DesiredState = STATES.NAVIGATION
-			m_DesiredDirection = PhysicsG.LEFT
+			m_InputsToProcess.append([STATES.NAVIGATION, PhysicsG.LEFT])
 			print("Left Act Pressed")
+		elif (m_State == STATES.NAVIGATION):
+			if (event.is_action_released("right") || event.is_action_released("left")):
+				m_InputsToProcess.append([STATES.NAVIGATION, PhysicsG.NULL_VECTOR])
 	else:
 		return false
 	return true
 	
 func ParseAttackInput_E(event):
 	if (event.is_action_pressed("attack")):
-		m_DesiredState = STATES.ATTACK
 		if (m_FacingRight):
-			m_DesiredDirection = PhysicsG.RIGHT
+			m_InputsToProcess.append([STATES.ATTACK, PhysicsG.RIGHT])
 		else:
-			m_DesiredDirection = PhysicsG.LEFT
+			m_InputsToProcess.append([STATES.ATTACK, PhysicsG.LEFT])
 		print("Attack Act Pressed")
 		return true
 		
