@@ -25,8 +25,9 @@ const JUMP_TIME = 1.2
 
 export var PlatformRes : PackedScene
 
-func init(device):
+func init(device, modulate_color):
 	m_OwnedDevice = device
+	$hip.set_modulate(modulate_color)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -46,7 +47,7 @@ func _physics_process(delta):
 			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
 				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
 			desired_velocity.y -= (2.0 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
-	elif (m_Velocity.x > 0.0 && m_IsOnGround):
+	elif (abs(m_Velocity.x) > 0.0 && m_IsOnGround):
 		if (abs(m_Velocity.x) < 0.01):
 			m_Velocity = 0.0
 		else:
@@ -54,6 +55,7 @@ func _physics_process(delta):
 		
 	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP)
 	m_IsOnGround = m_Velocity.y == 0
+	m_FacingRight = m_Velocity.x > 0
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -163,20 +165,24 @@ func SM_Dead(delta):
 	print("Player : Dead")
 	SM_TransitionIfAny(m_DesiredState)
 	
-	
+var m_AttackCompleted = false
 func SM_Attack(delta):
 	print("Player : Attack")
-	if(m_TimeSinceLastStateChange > 10.0):
+	if(m_AttackCompleted):
 		m_DesiredState = STATES.IDLE	
 	SM_TransitionIfAny(m_DesiredState)
 		
 func SM_Attack_OnEnter():
+	m_AttackCompleted = false
 	emit_signal("s_PlayAnimation", "player_attack")
+	$PlayerAnimator.connect("animation_finished", self, "SM_OnAttackAnimation_Ended")
 	var new_platform_position = global_position + (m_DesiredDirection + Vector2(sign(m_DesiredDirection.x) * 3.0, -3.0))
 	var new_platform = PlatformRes.instance()
 	add_child(new_platform)
 	new_platform.position = new_platform_position
-		
+	
+func SM_OnAttackAnimation_Ended(anim_name):
+	m_AttackCompleted = true
 	
 ###########################################
 # input
@@ -266,9 +272,6 @@ func ParseAttackInput():
 # Render
 
 func UpdateRender(delta):
-	if (abs(m_Velocity.x) > 0):
-		m_FacingRight = m_Velocity.x > 0
-		
 	if (m_FacingRight):
 		$hip.scale.x *= -1.0
 
