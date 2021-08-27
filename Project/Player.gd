@@ -66,6 +66,12 @@ func _process(delta):
 
 func Statemachine_Process(delta):
 	m_TimeSinceLastStateChange += delta
+	
+	if (m_Health < 0.0):
+		m_DesiredState = STATES.DEAD
+	elif m_PendingHurt:
+		m_DesiredState = STATES.HURT
+	
 	match m_State:
 		STATES.IDLE:
 			SM_Idle(delta)
@@ -273,3 +279,13 @@ func _on_Timer_timeout():
 ###########################################
 # Sound
 
+###########################################
+# Damage
+onready var m_MaxHealth = 100
+onready var m_Health = m_MaxHealth
+
+onready var m_PendingHurt = false
+
+func OnDamage(damage):
+	m_Health -= damage
+	m_PendingHurt = true
