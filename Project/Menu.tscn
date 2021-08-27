@@ -52,9 +52,9 @@ custom_fonts/font = SubResource( 2 )
 text = "start"
 
 [node name="end_button" type="Button" parent="Panel"]
-margin_left = 108.656
+margin_left = 111.185
 margin_top = 277.467
-margin_right = 159.656
+margin_right = 162.185
 margin_bottom = 301.467
 rect_scale = Vector2( 6.10345, 3.88701 )
 custom_styles/normal = SubResource( 6 )
