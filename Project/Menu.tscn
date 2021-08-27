@@ -1,7 +1,6 @@
 [gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://res/fonts/Kenney Future.ttf" type="DynamicFontData" id=1]
-[ext_resource path="res://res/fonts/Kenney Pixel.ttf" type="DynamicFontData" id=2]
 [ext_resource path="res://res/fonts/Kenney Future Narrow.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://res/Textures/MenuBackground.png" type="Texture" id=4]
 [ext_resource path="res://Menu.gd" type="Script" id=5]
@@ -10,11 +9,15 @@
 texture = ExtResource( 4 )
 region_rect = Rect2( 0, 0, 603, 338 )
 
-[sub_resource type="DynamicFont" id=1]
-font_data = ExtResource( 2 )
+[sub_resource type="StyleBoxFlat" id=5]
+bg_color = Color( 0.898039, 0.6, 0.0745098, 0 )
 
 [sub_resource type="DynamicFont" id=2]
+outline_color = Color( 0.0470588, 0.027451, 0.027451, 1 )
 font_data = ExtResource( 3 )
+
+[sub_resource type="StyleBoxFlat" id=6]
+bg_color = Color( 0.6, 0.6, 0.6, 0 )
 
 [sub_resource type="DynamicFont" id=3]
 size = 14
@@ -38,38 +41,23 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="MenuLabel" type="Label" parent="Panel"]
-margin_left = 205.194
-margin_top = -10.4379
-margin_right = 272.194
-margin_bottom = 3.56211
-rect_scale = Vector2( 10.2364, 12.7732 )
-rect_pivot_offset = Vector2( 3.15857, -0.0366745 )
-custom_fonts/font = SubResource( 1 )
-custom_colors/font_color = Color( 0.823529, 0.509804, 0.105882, 1 )
-custom_colors/font_outline_modulate = Color( 0.972549, 0.937255, 0.0784314, 1 )
-custom_colors/font_color_shadow = Color( 0.231373, 0.886275, 0, 0 )
-text = "MENU"
-align = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="start_button" type="Button" parent="Panel"]
-margin_left = 361.587
-margin_top = 235.472
-margin_right = 424.587
-margin_bottom = 259.472
+margin_left = 73.3052
+margin_top = 179.839
+margin_right = 136.305
+margin_bottom = 203.839
 rect_scale = Vector2( 5.20181, 4.08297 )
+custom_styles/normal = SubResource( 5 )
 custom_fonts/font = SubResource( 2 )
 text = "start"
 
 [node name="end_button" type="Button" parent="Panel"]
-margin_left = 366.592
-margin_top = 368.503
-margin_right = 417.592
-margin_bottom = 392.503
+margin_left = 108.656
+margin_top = 277.467
+margin_right = 159.656
+margin_bottom = 301.467
 rect_scale = Vector2( 6.10345, 3.88701 )
+custom_styles/normal = SubResource( 6 )
 custom_fonts/font = SubResource( 3 )
 text = "END"
 align = 0
