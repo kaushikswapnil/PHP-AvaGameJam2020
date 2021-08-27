@@ -8,6 +8,7 @@ extents = Vector2( 1.2233, 11.0426 )
 
 [node name="Weapon" type="Area2D"]
 script = ExtResource( 1 )
+OnHitDamage = 30
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0.325628, -14.3581 )
@@ -18,3 +19,5 @@ position = Vector2( 1.62325, -9.86665 )
 scale = Vector2( 0.1, 0.1 )
 texture = ExtResource( 2 )
 offset = Vector2( -13.2595, -8.14032 )
+
+[connection signal="body_entered" from="." to="." method="_on_Weapon_body_entered"]
