@@ -54,12 +54,13 @@ func _physics_process(delta):
 			m_Velocity.x *= 0.5 #friction dampener			
 		
 	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP)
+	m_DesiredDirection = Vector2(0, 0)
 	m_IsOnGround = m_Velocity.y == 0
 	m_FacingRight = m_Velocity.x > 0
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	ParseInput()
+	ParseInput(delta)
 	Statemachine_Process(delta)
 	UpdateRender(delta)
 	
@@ -129,7 +130,7 @@ func SM_Idle_OnEnter():
 	
 func SM_Navigation(delta):
 	print("Player : Navigation")
-	if (m_DesiredDirection.length() == 0.0 && m_Velocity.length() < 0.1):
+	if (m_TimeSinceLastNavigationalInput > 2 * delta && m_Velocity.length() < 0.1):
 		m_Velocity = Vector2(0.0, 0.0)
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
@@ -190,6 +191,8 @@ func SM_OnAttackAnimation_Ended(anim_name):
 onready var m_OwnedDevice = InvalidDevice
 const KeyBoard = -1
 const InvalidDevice = -2
+onready var m_TimeSinceLastInput = 0
+onready var m_TimeSinceLastNavigationalInput = 0
 
 func _input(event):
 	if (event is InputEventMouseButton || event is InputEventMouseMotion):
@@ -199,34 +202,42 @@ func _input(event):
 		return
 		
 	if (ParseAttackInput_E(event)):
-		return 
+		m_TimeSinceLastInput = 0 
 	elif (ParseNavigationalInput_E(event)):
-		return 
+		m_TimeSinceLastInput = 0 
+		m_TimeSinceLastNavigationalInput = 0
 	return 
 
-func ParseInput():
+func ParseInput(delta):
+	m_TimeSinceLastInput += delta
+	m_TimeSinceLastNavigationalInput += delta
+	
 	if (m_OwnedDevice != InvalidDevice):
 		return #Only parse input here if we dont own a device 
 	
 	if (ParseAttackInput()):
+		m_TimeSinceLastInput = 0
 		return true
 	elif (ParseNavigationalInput()):
+		m_TimeSinceLastInput = 0
+		m_TimeSinceLastNavigationalInput
 		return true
 	return false
 
 func ParseNavigationalInput_E(event):
-	if (event.is_action_pressed("jump") && m_IsOnGround):
-		m_DesiredState = STATES.JUMP
-		m_DesiredDirection = PhysicsG.UP
-		print("Jump Act Pressed")
-	elif (event.is_action_pressed("right")):
-		m_DesiredState = STATES.NAVIGATION
-		m_DesiredDirection = PhysicsG.RIGHT
-		print("Right Act Pressed")
-	elif (event.is_action_pressed("left")):
-		m_DesiredState = STATES.NAVIGATION
-		m_DesiredDirection = PhysicsG.LEFT
-		print("Left Act Pressed")
+	if (m_IsOnGround):
+		if (event.is_action_pressed("jump")):
+			m_DesiredState = STATES.JUMP
+			m_DesiredDirection = PhysicsG.UP
+			print("Jump Act Pressed")
+		elif (event.is_action_pressed("right")):
+			m_DesiredState = STATES.NAVIGATION
+			m_DesiredDirection = PhysicsG.RIGHT
+			print("Right Act Pressed")
+		elif (event.is_action_pressed("left")):
+			m_DesiredState = STATES.NAVIGATION
+			m_DesiredDirection = PhysicsG.LEFT
+			print("Left Act Pressed")
 	else:
 		return false
 	return true
