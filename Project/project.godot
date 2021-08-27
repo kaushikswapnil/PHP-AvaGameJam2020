@@ -118,11 +118,6 @@ _global_script_classes=[ {
 "class": "SS2D_VertexProperties",
 "language": "GDScript",
 "path": "res://addons/rmsmartshape/vertex_properties.gd"
-}, {
-"base": "Area2D",
-"class": "Weapon",
-"language": "GDScript",
-"path": "res://Weapon.gd"
 } ]
 _global_script_class_icons={
 "Player": "",
@@ -146,8 +141,7 @@ _global_script_class_icons={
 "SS2D_Shape_Closed": "res://addons/rmsmartshape/assets/closed_shape.png",
 "SS2D_Shape_Open": "res://addons/rmsmartshape/assets/open_shape.png",
 "SS2D_Strings": "",
-"SS2D_VertexProperties": "",
-"Weapon": ""
+"SS2D_VertexProperties": ""
 }
 
 [application]
