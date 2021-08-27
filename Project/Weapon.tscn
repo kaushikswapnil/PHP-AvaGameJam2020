@@ -13,13 +13,13 @@ script = ExtResource( 1 )
 OnHitDamage = 30
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( 0.325628, -14.3581 )
+position = Vector2( -0.0459998, -13.8378 )
 shape = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
-position = Vector2( 1.62325, -9.86665 )
+position = Vector2( -0.16045, 0.0187693 )
 scale = Vector2( 0.1, 0.1 )
 texture = ExtResource( 2 )
-offset = Vector2( -13.2595, -8.14032 )
+offset = Vector2( 0.117948, -106.251 )
 
 [connection signal="body_entered" from="." to="." method="_on_Weapon_body_entered"]
