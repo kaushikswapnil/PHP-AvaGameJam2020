@@ -57,6 +57,11 @@ func _physics_process(delta):
 			desired_velocity.x = PhysicsG.MAX_SPEED
 		else:
 			desired_velocity.x = 0
+	elif m_IsOnGround:
+		if (abs(desired_velocity.x) < 1.0):
+			desired_velocity.x = 0
+		else:
+			desired_velocity.x *= 0.5
 
 	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP, true)
 	m_IsOnGround = m_Velocity.y == 0
@@ -77,10 +82,8 @@ var m_PreviousState = m_State
 
 func Statemachine_Process(delta):
 	m_TimeSinceLastStateChange += delta
-	
-	if (m_Health < 0.0):
-		m_DesiredState = STATES.DEAD
-	elif m_PendingHurt:
+
+	if m_PendingHurt:
 		m_DesiredState = STATES.HURT
 	
 	match m_State:
@@ -107,6 +110,8 @@ func SM_Transition(to_state):
 	match m_State:
 		STATES.HURT:
 			SM_Hurt_OnExit()
+		STATES.DEAD:
+			SM_Dead_OnExit()
 	
 	m_PreviousState = m_State
 	m_State = to_state
@@ -123,6 +128,8 @@ func SM_Transition(to_state):
 			SM_Jump_OnEnter()
 		STATES.HURT:
 			SM_Hurt_OnEnter()
+		STATES.DEAD:
+			SM_Dead_OnEnter()
 	
 	print("Transitioning to state ", m_State)
 	
@@ -158,7 +165,8 @@ func SM_Jump(delta):
 	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_Jump_OnEnter():
-	m_Velocity.y = -300.0
+	m_Velocity.y -= 400.0
+	m_Velocity.x *= 1.5
 	emit_signal("s_PlayAnimation", "player_jump")
 	
 func SM_Block(delta):
@@ -167,9 +175,10 @@ func SM_Block(delta):
 	
 onready var m_HurtFrameCounter = 0
 const HurtFramePersistence = 180
-
 func SM_Hurt(delta):
-	print("Player : Hurt")
+	if (m_Health < 0.0):
+		m_DesiredState = STATES.DEAD
+	
 	m_HurtFrameCounter += 1
 	if (m_HurtFrameCounter >= HurtFramePersistence):
 		m_DesiredState = STATES.IDLE
@@ -196,12 +205,36 @@ func SM_FALLING(delta):
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
 	
+onready var m_DeadFramePersistence = 360
+onready var m_DeadFrameCounter = 0
+onready var m_DeathCounter = 0
 func SM_Dead(delta):
-	print("Player : Dead")
+	m_DeadFrameCounter += 1
+	if (m_DeadFrameCounter >= m_DeadFramePersistence):
+		m_DesiredState = STATES.IDLE
+	else:
+		var modulator = int(ceil(m_DeadFrameCounter / 16))
+		var modulator_odd_even = modulator % 2
+		if (modulator_odd_even == 1):
+			var new_col = Color(1.0 - m_ModulateColor.r, 1.0 - m_ModulateColor.g, 1.0 - m_ModulateColor.b)
+			$hip.set_modulate(new_col)
+		else:
+			$hip.set_modulate(m_ModulateColor)	
+	
 	SM_TransitionIfAny(m_DesiredState)
+	
+func SM_Dead_OnEnter():
+	m_DeadFrameCounter = 0
+	m_DeathCounter += 1
+	emit_signal("s_PlayAnimation", "player_rest")
+	
+func SM_Dead_OnExit():
+	m_Health = m_MaxHealth * 0.75 / m_DeadFrameCounter
+	$hip.set_modulate(m_ModulateColor)
 	
 onready var m_Weapon = $hip/abdomen/chest/arm_right/forearm_right/hand_right/weapon_slot/Weapon
 var m_AttackCompleted = false
+onready var m_TargetHit = false
 
 var m_ListenForCombo = false
 var m_QueueCombo = false
@@ -216,6 +249,7 @@ func SM_Attack(delta):
 		
 func SM_Attack_OnEnter():
 	m_AttackCompleted = false
+	m_TargetHit = false
 	m_CurrentCombo = 1
 	if (m_DesiredIntent == EAttacks.A1):
 		emit_signal("s_PlayAnimation", "player_attack_1")
@@ -227,6 +261,7 @@ func SM_Attack_OnEnter():
 	m_Weapon.connect("OnDamageInflicted", self, "SM_OnAttack_TargetHit")
 	
 func SM_OnAttack_TargetHit(damage, body):
+	m_TargetHit = true
 	m_Weapon.disconnect("OnDamageInflicted", self, "SM_OnAttack_TargetHit")
 	
 func SM_OnAttack_ComboWindowStart():
@@ -243,27 +278,29 @@ func SM_OnAttackAnimation_Ended(anim_name):
 	m_AttackCompleted = true
 	m_ListenForCombo = false
 	m_QueueCombo = false
-	var facing = Vector2(1.0, 0.0)
-	if !m_FacingRight:
-		facing *= -1.0
-	var new_platform_position = global_position
-	#var rotation_degree = rotation_degrees
-	if anim_name == "player_attack_1":
-		new_platform_position += (facing * 165.5) + Vector2(0.0, -3.5)
-	elif anim_name == "player_attack_2":
-		new_platform_position += (facing * 5.5) + Vector2(0.0, -100.0)
-		#rotation_degree += 30.0
-	elif anim_name == "player_attack_3":
-		new_platform_position += (facing * 1.5) + Vector2(0.0, 80.5)
-		#rotation_degree -= 30.0
-	var new_platform = PlatformRes.instance()
-	get_parent().add_child(new_platform)
-	new_platform.position = new_platform_position
-	#new_platform.rotation_degrees = rotation_degree
-	new_platform.set_modulate(m_ModulateColor)
-	new_platform.collision_layer = m_PlatformCollisionLayer
-	new_platform.collision_mask = m_PlatformCollisionMask
 	$PlayerAnimator.disconnect("animation_finished", self, "SM_OnAttackAnimation_Ended")
+	
+	if (!m_TargetHit):
+		var facing = Vector2(1.0, 0.0)
+		if !m_FacingRight:
+			facing *= -1.0
+		var new_platform_position = global_position
+		#var rotation_degree = rotation_degrees
+		if anim_name == "player_attack_1":
+			new_platform_position += (facing * 225.5) + Vector2(0.0, -3.5)
+		elif anim_name == "player_attack_2":
+			new_platform_position += (facing * 5.5) + Vector2(0.0, -100.0)
+			#rotation_degree += 30.0
+		elif anim_name == "player_attack_3":
+			new_platform_position += (facing * 1.5) + Vector2(0.0, 80.5)
+			#rotation_degree -= 30.0
+		var new_platform = PlatformRes.instance()
+		get_parent().add_child(new_platform)
+		new_platform.position = new_platform_position
+		#new_platform.rotation_degrees = rotation_degree
+		new_platform.set_modulate(m_ModulateColor)
+		new_platform.collision_layer = m_PlatformCollisionLayer
+		new_platform.collision_mask = m_PlatformCollisionMask
 	
 ###########################################
 # input
@@ -302,11 +339,20 @@ const m_EInputActionToJoyButton = [JOY_DPAD_LEFT, JOY_DPAD_RIGHT, JOY_DPAD_UP, J
 const m_EInputActionToKey = [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACE, KEY_A ]
 const m_EInputActionToAxis = [JOY_ANALOG_LX, JOY_ANALOG_LX, JOY_ANALOG_LY , JOY_ANALOG_LY , -1, -1 ]
 
+const InputDeadzone = 0.3
 func Input_IsKeyPressed(action):
-	return m_FrameInputActionMapping[action] != 0.0
+	return m_FrameInputActionMapping[action] > InputDeadzone
 
 func Input_IsKeyReleased(action):
-	return m_FrameInputActionMapping[action] == 0.0
+	return m_FrameInputActionMapping[action] < InputDeadzone
+	
+func Input_IsInputActionEngaged(action, positive = true, deadzone = InputDeadzone):
+	if abs(m_FrameInputActionMapping[action]) > deadzone:
+		if positive:
+			return m_FrameInputActionMapping[action] > 0.0
+		else:
+			return m_FrameInputActionMapping[action] < 0.0
+	return false	
 
 func TestInputActionForFrame(event, action):
 	var action_pressed = false
@@ -348,11 +394,11 @@ func ParseNavigationalInput():
 			m_DesiredState = STATES.JUMP
 			m_DesiredIntent = 0
 			m_DesiredIntentStrength = 1.0
-		elif (m_FrameInputActionMapping[EInputActionMapping.Right] > 0.0):
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Right)):
 			m_DesiredState = STATES.NAVIGATION
 			m_DesiredIntent = ENavigationalIntent.MoveRight
 			m_DesiredIntentStrength = 1.0
-		elif (m_FrameInputActionMapping[EInputActionMapping.Left] < 0.0 || Input_IsKeyPressed(EInputActionMapping.Left)):
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Left, false) || Input_IsKeyPressed(EInputActionMapping.Left)):
 			m_DesiredState = STATES.NAVIGATION
 			m_DesiredIntent = ENavigationalIntent.MoveLeft
 			m_DesiredIntentStrength = 1.0
@@ -368,10 +414,10 @@ func ParseAttackInput():
 	if (Input_IsKeyPressed(EInputActionMapping.Attack)):
 		m_DesiredState = STATES.ATTACK
 		m_DesiredIntentStrength = 1.0
-		if (m_FrameInputActionMapping[EInputActionMapping.Up] > 0.0):
-			m_DesiredIntent = EAttacks.A2
-		elif (m_FrameInputActionMapping[EInputActionMapping.Down] < 0.0 || Input_IsKeyPressed(EInputActionMapping.Down)):
+		if (Input_IsInputActionEngaged(EInputActionMapping.Down)):
 			m_DesiredIntent = EAttacks.A3
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Up, false) || Input_IsKeyPressed(EInputActionMapping.Up)):
+			m_DesiredIntent = EAttacks.A2
 		else:
 			m_DesiredIntent = EAttacks.A1
 		
