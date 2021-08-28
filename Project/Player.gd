@@ -57,6 +57,11 @@ func _physics_process(delta):
 			desired_velocity.x = PhysicsG.MAX_SPEED
 		else:
 			desired_velocity.x = 0
+	elif m_IsOnGround:
+		if (abs(desired_velocity.x) < 1.0):
+			desired_velocity.x = 0
+		else:
+			desired_velocity.x *= 0.5
 
 	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP, true)
 	m_IsOnGround = m_Velocity.y == 0
@@ -158,7 +163,12 @@ func SM_Jump(delta):
 	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_Jump_OnEnter():
-	m_Velocity.y = -300.0
+	var jump_dir = Vector2(1, 0)
+	jump_dir = jump_dir.rotated(-1.0472)
+	if (!m_FacingRight):
+		jump_dir.x *= -1.0
+	jump_dir *= 400.0
+	m_Velocity += jump_dir
 	emit_signal("s_PlayAnimation", "player_jump")
 	
 func SM_Block(delta):
@@ -302,11 +312,20 @@ const m_EInputActionToJoyButton = [JOY_DPAD_LEFT, JOY_DPAD_RIGHT, JOY_DPAD_UP, J
 const m_EInputActionToKey = [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACE, KEY_A ]
 const m_EInputActionToAxis = [JOY_ANALOG_LX, JOY_ANALOG_LX, JOY_ANALOG_LY , JOY_ANALOG_LY , -1, -1 ]
 
+const InputDeadzone = 0.3
 func Input_IsKeyPressed(action):
-	return m_FrameInputActionMapping[action] != 0.0
+	return m_FrameInputActionMapping[action] > InputDeadzone
 
 func Input_IsKeyReleased(action):
-	return m_FrameInputActionMapping[action] == 0.0
+	return m_FrameInputActionMapping[action] < InputDeadzone
+	
+func Input_IsInputActionEngaged(action, positive = true, deadzone = InputDeadzone):
+	if abs(m_FrameInputActionMapping[action]) > deadzone:
+		if positive:
+			return m_FrameInputActionMapping[action] > 0.0
+		else:
+			return m_FrameInputActionMapping[action] < 0.0
+	return false	
 
 func TestInputActionForFrame(event, action):
 	var action_pressed = false
@@ -348,11 +367,11 @@ func ParseNavigationalInput():
 			m_DesiredState = STATES.JUMP
 			m_DesiredIntent = 0
 			m_DesiredIntentStrength = 1.0
-		elif (m_FrameInputActionMapping[EInputActionMapping.Right] > 0.0):
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Right)):
 			m_DesiredState = STATES.NAVIGATION
 			m_DesiredIntent = ENavigationalIntent.MoveRight
 			m_DesiredIntentStrength = 1.0
-		elif (m_FrameInputActionMapping[EInputActionMapping.Left] < 0.0 || Input_IsKeyPressed(EInputActionMapping.Left)):
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Left, false) || Input_IsKeyPressed(EInputActionMapping.Left)):
 			m_DesiredState = STATES.NAVIGATION
 			m_DesiredIntent = ENavigationalIntent.MoveLeft
 			m_DesiredIntentStrength = 1.0
@@ -368,9 +387,9 @@ func ParseAttackInput():
 	if (Input_IsKeyPressed(EInputActionMapping.Attack)):
 		m_DesiredState = STATES.ATTACK
 		m_DesiredIntentStrength = 1.0
-		if (m_FrameInputActionMapping[EInputActionMapping.Up] > 0.0):
+		if (Input_IsInputActionEngaged(EInputActionMapping.Up)):
 			m_DesiredIntent = EAttacks.A2
-		elif (m_FrameInputActionMapping[EInputActionMapping.Down] < 0.0 || Input_IsKeyPressed(EInputActionMapping.Down)):
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Down, false) || Input_IsKeyPressed(EInputActionMapping.Down)):
 			m_DesiredIntent = EAttacks.A3
 		else:
 			m_DesiredIntent = EAttacks.A1
