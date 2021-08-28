@@ -57,6 +57,16 @@ func _physics_process(delta):
 			desired_velocity.x = PhysicsG.MAX_SPEED
 		else:
 			desired_velocity.x = 0
+	elif (m_State == STATES.FALLING):
+		var FallingNavigationalDampener = 0.6
+		if (m_DesiredState == STATES.NAVIGATION):
+			if (m_DesiredIntent != ENavigationalIntent.Idle):
+				if (abs(desired_velocity.x) > PhysicsG.MAX_SPEED):
+					desired_velocity.x -= sign(desired_velocity.x) * PhysicsG.MAX_SPEED *  FallingNavigationalDampener
+				elif m_DesiredIntent == ENavigationalIntent.MoveLeft:
+					desired_velocity.x = -PhysicsG.MAX_SPEED * FallingNavigationalDampener
+				else:
+					desired_velocity.x = PhysicsG.MAX_SPEED * FallingNavigationalDampener
 	elif m_IsOnGround:
 		if (abs(desired_velocity.x) < 1.0):
 			desired_velocity.x = 0
@@ -161,7 +171,8 @@ func SM_Navigation_OnEnter():
 	emit_signal("s_PlayAnimation", "player_walk")
 
 func SM_Jump(delta):
-	m_DesiredState = STATES.FALLING
+	if (!SM_HasPendingTransition()):
+		m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_Jump_OnEnter():
@@ -176,12 +187,16 @@ func SM_Block(delta):
 onready var m_HurtFrameCounter = 0
 const HurtFramePersistence = 180
 func SM_Hurt(delta):
+	m_HurtFrameCounter += 1
+	
 	if (m_Health < 0.0):
 		m_DesiredState = STATES.DEAD
-	
-	m_HurtFrameCounter += 1
+		SM_TransitionIfAny(m_DesiredState)
+		return
+		
 	if (m_HurtFrameCounter >= HurtFramePersistence):
 		m_DesiredState = STATES.IDLE
+		SM_TransitionIfAny(m_DesiredState)
 	else:
 		var modulator = int(ceil(m_HurtFrameCounter / 8))
 		var modulator_odd_even = modulator % 2
@@ -190,8 +205,6 @@ func SM_Hurt(delta):
 			$hip.set_modulate(new_col)
 		else:
 			$hip.set_modulate(m_ModulateColor)	
-		
-	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_Hurt_OnEnter():
 	m_HurtFrameCounter = 0
@@ -201,9 +214,34 @@ func SM_Hurt_OnExit():
 	$hip.set_modulate(m_ModulateColor)	
 	
 func SM_FALLING(delta):
-	if (!SM_HasPendingTransition() && m_IsOnGround):
-		m_DesiredState = STATES.IDLE
-	SM_TransitionIfAny(m_DesiredState)
+	if (!SM_HasPendingTransition()):
+		if (m_IsOnGround):
+			m_DesiredState = STATES.IDLE
+			SM_Transition(m_DesiredState)
+			return
+		
+		if (Input_IsInputActionEngaged(EInputActionMapping.Right)):
+			m_DesiredState = STATES.NAVIGATION
+			m_DesiredIntent = ENavigationalIntent.MoveRight
+			m_DesiredIntentStrength = 1.0
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Left, false) || Input_IsKeyPressed(EInputActionMapping.Left)):
+			m_DesiredState = STATES.NAVIGATION
+			m_DesiredIntent = ENavigationalIntent.MoveLeft
+			m_DesiredIntentStrength = 1.0
+		else:
+			m_DesiredState = m_State
+			m_DesiredIntent = ENavigationalIntent.Idle
+			m_DesiredIntentStrength = 0.0
+		
+	if (SM_HasPendingTransition()):
+		match m_DesiredState:
+			STATES.NAVIGATION:
+				if m_IsOnGround:
+					SM_Transition(m_DesiredState)
+			STATES.JUMP:
+				return
+			_:
+				SM_TransitionIfAny(m_DesiredState)
 	
 onready var m_DeadFramePersistence = 360
 onready var m_DeadFrameCounter = 0
@@ -243,9 +281,9 @@ var m_CurrentCombo = 0
 func SM_Attack(delta):
 	if(m_AttackCompleted):
 		m_DesiredState = STATES.IDLE	
-	if(m_ListenForCombo && Input_IsKeyPressed(EInputActionMapping.Attack)):
+		SM_TransitionIfAny(m_DesiredState)
+	elif(m_ListenForCombo && Input_IsKeyPressed(EInputActionMapping.Attack)):
 		m_QueueCombo = true
-	SM_TransitionIfAny(m_DesiredState)
 		
 func SM_Attack_OnEnter():
 	m_AttackCompleted = false
