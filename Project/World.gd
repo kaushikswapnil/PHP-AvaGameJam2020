@@ -45,6 +45,7 @@ func _on_Menu_OnQuitPressed():
 	
 func StartGame():	
 	$Menu.visible = false
+	$BackGroundMusicPlayer.play()
 	var rand_angle = rand_range(0.0, 2 * 3.14)
 	$LevelBackground.AddPortal(Vector2(rand_range(0, 1), rand_range(0, 1)), Vector2(cos(rand_angle), sin(rand_angle)))
 	#AddPlayer(-1, false, Color(0, 0, 0))
