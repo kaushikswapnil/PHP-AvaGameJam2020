@@ -213,7 +213,7 @@ func SM_Dead(delta):
 	if (m_DeadFrameCounter >= m_DeadFramePersistence):
 		m_DesiredState = STATES.IDLE
 	else:
-		var modulator = int(ceil(m_DeadFramePersistence / 16))
+		var modulator = int(ceil(m_DeadFrameCounter / 16))
 		var modulator_odd_even = modulator % 2
 		if (modulator_odd_even == 1):
 			var new_col = Color(1.0 - m_ModulateColor.r, 1.0 - m_ModulateColor.g, 1.0 - m_ModulateColor.b)
@@ -229,11 +229,12 @@ func SM_Dead_OnEnter():
 	emit_signal("s_PlayAnimation", "player_rest")
 	
 func SM_Dead_OnExit():
-	m_Health = m_MaxHealth * 0.5
+	m_Health = m_MaxHealth * 0.75 / m_DeadFrameCounter
 	$hip.set_modulate(m_ModulateColor)
 	
 onready var m_Weapon = $hip/abdomen/chest/arm_right/forearm_right/hand_right/weapon_slot/Weapon
 var m_AttackCompleted = false
+onready var m_TargetHit = false
 
 var m_ListenForCombo = false
 var m_QueueCombo = false
@@ -248,6 +249,7 @@ func SM_Attack(delta):
 		
 func SM_Attack_OnEnter():
 	m_AttackCompleted = false
+	m_TargetHit = false
 	m_CurrentCombo = 1
 	if (m_DesiredIntent == EAttacks.A1):
 		emit_signal("s_PlayAnimation", "player_attack_1")
@@ -259,6 +261,7 @@ func SM_Attack_OnEnter():
 	m_Weapon.connect("OnDamageInflicted", self, "SM_OnAttack_TargetHit")
 	
 func SM_OnAttack_TargetHit(damage, body):
+	m_TargetHit = true
 	m_Weapon.disconnect("OnDamageInflicted", self, "SM_OnAttack_TargetHit")
 	
 func SM_OnAttack_ComboWindowStart():
@@ -275,27 +278,29 @@ func SM_OnAttackAnimation_Ended(anim_name):
 	m_AttackCompleted = true
 	m_ListenForCombo = false
 	m_QueueCombo = false
-	var facing = Vector2(1.0, 0.0)
-	if !m_FacingRight:
-		facing *= -1.0
-	var new_platform_position = global_position
-	#var rotation_degree = rotation_degrees
-	if anim_name == "player_attack_1":
-		new_platform_position += (facing * 265.5) + Vector2(0.0, -3.5)
-	elif anim_name == "player_attack_2":
-		new_platform_position += (facing * 5.5) + Vector2(0.0, -200.0)
-		#rotation_degree += 30.0
-	elif anim_name == "player_attack_3":
-		new_platform_position += (facing * 1.5) + Vector2(0.0, 80.5)
-		#rotation_degree -= 30.0
-	var new_platform = PlatformRes.instance()
-	get_parent().add_child(new_platform)
-	new_platform.position = new_platform_position
-	#new_platform.rotation_degrees = rotation_degree
-	new_platform.set_modulate(m_ModulateColor)
-	new_platform.collision_layer = m_PlatformCollisionLayer
-	new_platform.collision_mask = m_PlatformCollisionMask
 	$PlayerAnimator.disconnect("animation_finished", self, "SM_OnAttackAnimation_Ended")
+	
+	if (!m_TargetHit):
+		var facing = Vector2(1.0, 0.0)
+		if !m_FacingRight:
+			facing *= -1.0
+		var new_platform_position = global_position
+		#var rotation_degree = rotation_degrees
+		if anim_name == "player_attack_1":
+			new_platform_position += (facing * 225.5) + Vector2(0.0, -3.5)
+		elif anim_name == "player_attack_2":
+			new_platform_position += (facing * 5.5) + Vector2(0.0, -100.0)
+			#rotation_degree += 30.0
+		elif anim_name == "player_attack_3":
+			new_platform_position += (facing * 1.5) + Vector2(0.0, 80.5)
+			#rotation_degree -= 30.0
+		var new_platform = PlatformRes.instance()
+		get_parent().add_child(new_platform)
+		new_platform.position = new_platform_position
+		#new_platform.rotation_degrees = rotation_degree
+		new_platform.set_modulate(m_ModulateColor)
+		new_platform.collision_layer = m_PlatformCollisionLayer
+		new_platform.collision_mask = m_PlatformCollisionMask
 	
 ###########################################
 # input
@@ -410,9 +415,9 @@ func ParseAttackInput():
 		m_DesiredState = STATES.ATTACK
 		m_DesiredIntentStrength = 1.0
 		if (Input_IsInputActionEngaged(EInputActionMapping.Down)):
-			m_DesiredIntent = EAttacks.A2
-		elif (Input_IsInputActionEngaged(EInputActionMapping.Up, false) || Input_IsKeyPressed(EInputActionMapping.Up)):
 			m_DesiredIntent = EAttacks.A3
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Up, false) || Input_IsKeyPressed(EInputActionMapping.Up)):
+			m_DesiredIntent = EAttacks.A2
 		else:
 			m_DesiredIntent = EAttacks.A1
 		
