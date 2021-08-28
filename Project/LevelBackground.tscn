@@ -1,17 +1,50 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://icon.png" type="Texture" id=1]
+[ext_resource path="res://LevelBackground.gd" type="Script" id=2]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
 
+uniform vec2 portal_position = vec2(0.5, 0.5);
+uniform vec2 portal_direction = vec2(0.0, 1.0);
+
 void fragment(){
-  COLOR = vec4(0.4, 0.6, 0.9, 1.0);
+	COLOR = vec4(0.0, 0.0, 0.0, 1.0);
+	
+	vec2 uv_pos = vec2(UV);
+	vec2 to_uv = uv_pos - portal_position;
+	
+	float to_uv_length = length(to_uv);
+	if (to_uv_length < 0.1)
+	{	
+		float alpha = 1.0;
+		if (to_uv_length > 0.90)
+		{
+			float near_edge_factor = (to_uv_length-0.90) / 0.1;
+			alpha = 1.0 - near_edge_factor;
+		}
+		
+		COLOR = vec4(1.0, 1.0, 1.0, alpha);
+	}
+	else
+	{
+		to_uv = normalize(to_uv);
+		
+		float dot_prod = dot(to_uv, portal_direction);
+		if (dot_prod > 0.75)
+		{
+			COLOR = vec4(1.0, 1.0, 1.0, 0.5);
+		}	
+	}
 }"
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
+shader_param/portal_position = Vector2( 0.5, 0.5 )
+shader_param/portal_direction = Vector2( 0, 1 )
 
 [node name="LevelBackground" type="Sprite"]
 material = SubResource( 2 )
 texture = ExtResource( 1 )
+script = ExtResource( 2 )
