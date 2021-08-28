@@ -58,15 +58,20 @@ func _physics_process(delta):
 		else:
 			desired_velocity.x = 0
 	elif (m_State == STATES.FALLING):
-		var FallingNavigationalDampener = 0.6
+		var FallingNavigationalDampener = 0.4
+		var desired_falling_hor_speed = PhysicsG.MAX_SPEED *  FallingNavigationalDampener
+		desired_velocity.x *= 0.99
 		if (m_DesiredState == STATES.NAVIGATION):
-			if (m_DesiredIntent != ENavigationalIntent.Idle):
-				if (abs(desired_velocity.x) > PhysicsG.MAX_SPEED):
-					desired_velocity.x -= sign(desired_velocity.x) * PhysicsG.MAX_SPEED *  FallingNavigationalDampener
-				elif m_DesiredIntent == ENavigationalIntent.MoveLeft:
-					desired_velocity.x = -PhysicsG.MAX_SPEED * FallingNavigationalDampener
+			if (m_DesiredIntent == ENavigationalIntent.MoveLeft):
+				if (desired_velocity.x > -PhysicsG.MAX_SPEED):
+					desired_velocity.x -= desired_falling_hor_speed
 				else:
-					desired_velocity.x = PhysicsG.MAX_SPEED * FallingNavigationalDampener
+					desired_velocity.x = -desired_falling_hor_speed
+			elif (m_DesiredIntent == ENavigationalIntent.MoveRight):
+				if (desired_velocity.x < PhysicsG.MAX_SPEED):
+					desired_velocity.x += desired_falling_hor_speed
+				else:
+					desired_velocity.x = desired_falling_hor_speed		
 	elif m_IsOnGround:
 		if (abs(desired_velocity.x) < 1.0):
 			desired_velocity.x = 0
@@ -214,12 +219,12 @@ func SM_Hurt_OnExit():
 	$hip.set_modulate(m_ModulateColor)	
 	
 func SM_FALLING(delta):
-	if (!SM_HasPendingTransition()):
-		if (m_IsOnGround):
-			m_DesiredState = STATES.IDLE
-			SM_Transition(m_DesiredState)
-			return
-		
+	if (!SM_HasPendingTransition() && m_IsOnGround):
+		m_DesiredState = STATES.IDLE
+		SM_Transition(m_DesiredState)
+		return
+	
+	if (!SM_HasPendingTransition() || m_DesiredState == STATES.NAVIGATION):
 		if (Input_IsInputActionEngaged(EInputActionMapping.Right)):
 			m_DesiredState = STATES.NAVIGATION
 			m_DesiredIntent = ENavigationalIntent.MoveRight
