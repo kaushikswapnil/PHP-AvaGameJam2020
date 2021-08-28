@@ -45,6 +45,8 @@ func _on_Menu_OnQuitPressed():
 	
 func StartGame():	
 	$Menu.visible = false
+	var rand_angle = rand_range(0.0, 2 * 3.14)
+	$LevelBackground.AddPortal($DefaultSpawnPosition.position, Vector2(cos(rand_angle), sin(rand_angle)))
 	AddPlayer(-1, false, Color(0, 0, 0))
 	var connected_pads = Input.get_connected_joypads()
 	for x in connected_pads:
