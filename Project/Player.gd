@@ -32,10 +32,9 @@ func init(device, modulate_color, id):
 	m_ID = id
 	collision_layer = 1 << (m_ID + PLAYER_COLLISION_LAYER_OFFSET)
 	collision_mask = 1 << 0
+	var weapon_collision_mask = -collision_layer
 	for x in range(PLAYER_COLLISION_LAYER_OFFSET, PLAYER_COLLISION_LAYER_OFFSET + 5): #only five enemies now
-		collision_mask += 1 << x
-		
-	var weapon_collision_mask = collision_mask - collision_layer
+		weapon_collision_mask += 1 << x
 	m_PlatformCollisionLayer = 1 << (1 + m_ID)
 	collision_mask += m_PlatformCollisionLayer
 	m_PlatformCollisionMask = collision_layer
@@ -248,19 +247,19 @@ func SM_OnAttackAnimation_Ended(anim_name):
 	if !m_FacingRight:
 		facing *= -1.0
 	var new_platform_position = global_position
-	var rotation_degree = rotation_degrees
+	#var rotation_degree = rotation_degrees
 	if anim_name == "player_attack_1":
-		new_platform_position += (facing * 35.5) + Vector2(0.0, -3.5)
+		new_platform_position += (facing * 165.5) + Vector2(0.0, -3.5)
 	elif anim_name == "player_attack_2":
-		new_platform_position += (facing * 5.5) + Vector2(0.0, -24.0)
-		rotation_degree += 30.0
+		new_platform_position += (facing * 5.5) + Vector2(0.0, -100.0)
+		#rotation_degree += 30.0
 	elif anim_name == "player_attack_3":
-		new_platform_position += (facing * 3.5) + Vector2(0.0, 30.5)
-		rotation_degree -= 30.0
+		new_platform_position += (facing * 1.5) + Vector2(0.0, 80.5)
+		#rotation_degree -= 30.0
 	var new_platform = PlatformRes.instance()
 	get_parent().add_child(new_platform)
 	new_platform.position = new_platform_position
-	new_platform.rotation_degrees = rotation_degree
+	#new_platform.rotation_degrees = rotation_degree
 	new_platform.set_modulate(m_ModulateColor)
 	new_platform.collision_layer = m_PlatformCollisionLayer
 	new_platform.collision_mask = m_PlatformCollisionMask
