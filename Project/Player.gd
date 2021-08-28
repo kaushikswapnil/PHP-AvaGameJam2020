@@ -23,8 +23,11 @@ onready var m_ID = -1
 
 const PLAYER_COLLISION_LAYER_OFFSET = 10
 
+var m_ModulateColor = Color(0, 0, 0)
+
 func init(device, modulate_color, id):
 	m_OwnedDevice = device
+	m_ModulateColor = modulate_color
 	$hip.set_modulate(modulate_color)
 	m_ID = id
 	collision_layer = 1 << (m_ID + PLAYER_COLLISION_LAYER_OFFSET)
@@ -34,6 +37,7 @@ func init(device, modulate_color, id):
 	m_PlatformCollisionLayer = 1 << (1 + m_ID)
 	collision_mask += m_PlatformCollisionLayer
 	m_PlatformCollisionMask = collision_layer
+	m_Weapon.init(self)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -98,6 +102,7 @@ func Statemachine_Process(delta):
 			print("Something is wrong, I can feel it")
 
 func SM_Transition(to_state):
+	
 	m_PreviousState = m_State
 	m_State = to_state
 	m_TimeSinceLastStateChange = 0
@@ -111,6 +116,8 @@ func SM_Transition(to_state):
 			SM_Navigation_OnEnter()
 		STATES.JUMP:
 			SM_Jump_OnEnter()
+		STATES.HURT:
+			SM_Hurt_OnEnter()
 	
 	print("Transitioning to state ", m_State)
 	
@@ -153,9 +160,18 @@ func SM_Block(delta):
 	print("Player : Block")
 	SM_TransitionIfAny(m_DesiredState)
 	
+onready var m_HurtFrameCounter = 0
+const HurtFramePersistence = 180
+
 func SM_Hurt(delta):
 	print("Player : Hurt")
+	m_HurtFrameCounter += 1
+	if (m_HurtFrameCounter >= HurtFramePersistence):
+		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
+	
+func SM_Hurt_OnEnter():
+	m_HurtFrameCounter = 0
 	
 func SM_FALLING(delta):
 	if (!SM_HasPendingTransition() && m_IsOnGround):
@@ -226,7 +242,7 @@ func SM_OnAttackAnimation_Ended(anim_name):
 	get_parent().add_child(new_platform)
 	new_platform.position = new_platform_position
 	new_platform.rotation_degrees = rotation_degree
-	new_platform.set_modulate($hip.get_modulate())
+	new_platform.set_modulate(m_ModulateColor)
 	new_platform.collision_layer = m_PlatformCollisionLayer
 	new_platform.collision_mask = m_PlatformCollisionMask
 	$PlayerAnimator.disconnect("animation_finished", self, "SM_OnAttackAnimation_Ended")
@@ -360,6 +376,16 @@ func UpdateRender(delta):
 	elif (m_Velocity.x > 0.0):
 		m_FacingRight = true
 		$hip.scale.x *= -1.0
+	
+	if (m_State == STATES.HURT):
+		var modulator =(m_HurtFrameCounter % 5 == 0)
+		var modulator_odd_even = modulator % 2
+		if (modulator_odd_even == 1):
+			var new_col = Color(1.0 - m_ModulateColor.r, 1.0 - m_ModulateColor.g, 1.0 - m_ModulateColor.b)
+			$hip.set_modulate(new_col)
+		else:
+			$hip.set_modulate(m_ModulateColor)
+			
 
 ###########################################
 # Sound

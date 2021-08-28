@@ -6,17 +6,10 @@ signal OnDamageInflicted(damage, to_body)
 
 export var OnHitDamage : int
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+var m_OwnerPlayer
 
-var m_ComboCounter = 0
-
-func IncrementComboCounter():
-	m_ComboCounter += 1
-	
-func ResetComboCounter():
-	m_ComboCounter = 0
+func init(owner_player):
+	m_OwnerPlayer = owner_player
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -31,7 +24,7 @@ func DeactivateCollisionDetection():
 	monitoring = false
 
 func _on_Weapon_body_entered(body):
-	if body is Player:
+	if body is Player && body != m_OwnerPlayer:
 		body.OnDamage(OnHitDamage)
 		emit_signal("OnDamageInflicted", OnHitDamage, body)
 		
