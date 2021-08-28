@@ -4,7 +4,7 @@
 [ext_resource path="res://res/sword.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 1.2233, 11.0426 )
+extents = Vector2( 1.2233, 17.1974 )
 
 [node name="Weapon" type="Area2D"]
 monitoring = false
@@ -14,13 +14,13 @@ script = ExtResource( 1 )
 OnHitDamage = 30
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( -0.0459998, -13.8378 )
+position = Vector2( 0.152425, -16.6158 )
 shape = SubResource( 1 )
 
 [node name="Sprite" type="Sprite" parent="."]
-position = Vector2( -0.16045, 0.0187693 )
+position = Vector2( 0.0893059, -0.0808759 )
 scale = Vector2( 0.1, 0.1 )
 texture = ExtResource( 2 )
-offset = Vector2( 0.117948, -106.251 )
+offset = Vector2( -0.395358, -153.869 )
 
 [connection signal="body_entered" from="." to="." method="_on_Weapon_body_entered"]
