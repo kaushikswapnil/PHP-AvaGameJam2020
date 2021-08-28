@@ -45,8 +45,24 @@ func _on_Menu_OnQuitPressed():
 	
 func StartGame():	
 	$Menu.visible = false
-	var rand_angle = rand_range(0.0, 2 * 3.14)
-	$LevelBackground.AddPortal(Vector2(rand_range(0, 1), rand_range(0, 1)), Vector2(cos(rand_angle), sin(rand_angle)))
+	var screen_size = get_viewport().get_visible_rect().size
+	var rng = RandomNumberGenerator.new()
+	rng.seed = OS.get_time().second
+	var num_portals = rng.randi_range(1, 4)
+	for x in range(num_portals):
+		var portal_pos = Vector2(screen_size.x * 0.1, -screen_size.y)
+		var randomize_x = rng.randf_range(0.0, 1.0) < 0.4
+		if (randomize_x):
+			portal_pos.x = rng.randf_range(0.0, screen_size.x)
+		else:
+			var rand = rng.randf_range(0.0, 1.0)
+			if rand < 0.5:
+				portal_pos.x = 0.0
+			else:
+				portal_pos.x = screen_size.x
+			portal_pos.y  = rng.randf_range(-screen_size.y, 0.0)
+		$LevelBackground.AddPortal(portal_pos)
+	
 	#AddPlayer(-1, false, Color(0, 0, 0))
 	var connected_pads = Input.get_connected_joypads()
 	if (connected_pads.size() == 2):
