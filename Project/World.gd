@@ -8,6 +8,13 @@ onready var m_Started = false
 
 func _ready():
 	pass	
+	
+func _process(delta):
+	for player in m_Players:
+		for portal_pos in $LevelBackground.m_PortalWorldPositions:
+			var player_to_portal = portal_pos - player.global_position
+			if (player_to_portal.length() <= $LevelBackground.m_PortalWorldWidth):
+				ResetLevel(true)
 		
 func _on_joy_connection_changed(device_id, connected):
 	if (connected):
@@ -44,25 +51,7 @@ func _on_Menu_OnQuitPressed():
 	QuitGame()
 	
 func StartGame():	
-	$Menu.visible = false
-	var screen_size = get_viewport().get_visible_rect().size
-	var rng = RandomNumberGenerator.new()
-	rng.seed = OS.get_time().second
-	var num_portals = rng.randi_range(1, 4)
-	for x in range(num_portals):
-		var portal_pos = Vector2(screen_size.x * 0.1, -screen_size.y)
-		var randomize_x = rng.randf_range(0.0, 1.0) < 0.4
-		if (randomize_x):
-			portal_pos.x = rng.randf_range(0.0, screen_size.x)
-		else:
-			var rand = rng.randf_range(0.0, 1.0)
-			if rand < 0.5:
-				portal_pos.x = 0.0
-			else:
-				portal_pos.x = screen_size.x
-			portal_pos.y  = rng.randf_range(-screen_size.y, -screen_size.y * 0.5)
-		$LevelBackground.AddPortal(portal_pos)
-	$BackGroundMusicPlayer.play()
+	ResetLevel(false)
 	#AddPlayer(-1, false, Color(0, 0, 0))
 	var connected_pads = Input.get_connected_joypads()
 	if (connected_pads.size() == 2):
@@ -77,6 +66,33 @@ func StartGame():
 	
 func QuitGame():
 	get_tree().quit()
+	
+func ResetLevel(respawn_players):
+	$Menu.visible = false
+	var screen_size = get_viewport().get_visible_rect().size
+	var rng = RandomNumberGenerator.new()
+	rng.seed = OS.get_time().second
+	var num_portals = 1#rng.randi_range(1, 4)
+	$LevelBackground.Reset()
+	for x in range(num_portals):
+		var portal_pos = Vector2(screen_size.x * 0.1, -screen_size.y)
+		var randomize_x = rng.randf_range(0.0, 1.0) < 0.4
+		if (randomize_x):
+			portal_pos.x = rng.randf_range(0.0, screen_size.x)
+		else:
+			var rand = rng.randf_range(0.0, 1.0)
+			if rand < 0.5:
+				portal_pos.x = 0.0
+			else:
+				portal_pos.x = screen_size.x
+			portal_pos.y  = rng.randf_range(-screen_size.y, -screen_size.y * 0.5)
+		$LevelBackground.AddPortal(portal_pos)
+	$LevelBackground.init($Camera2D.global_position)
+	$BackGroundMusicPlayer.play()
+	
+	if respawn_players:
+		for p in m_Players:
+			p.global_position = $DefaultSpawnPosition.position + Vector2(rand_range(-2.0, 2.0), rand_range(-2.0, 2.0))
 
 func _input(event):
 	if (!m_Started && (event.is_action_pressed("jump") || event.is_action_pressed("ui_accept"))):

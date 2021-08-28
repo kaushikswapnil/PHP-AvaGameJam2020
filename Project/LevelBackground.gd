@@ -6,29 +6,44 @@ onready var m_PortalWorldPositions = []
 
 onready var m_TotalDelta = 0.0
 
-onready var m_LightSource = Vector2(0.0, 0.0)
+var m_CamPos = Vector2(0.0, 0.0)
+onready var m_LightSourceRadi = 0.0
+
+onready var m_PortalWorldWidth = 0.0
+onready var m_PortalUVWidth = 0.03
 
 func _ready():
 	pass # Replace with function body.
 	
+func init(cam_pos):
+	m_CamPos = cam_pos
+	var screen_size = get_viewport().get_visible_rect().size
+	m_PortalWorldWidth = screen_size.x * m_PortalUVWidth
+	var max_radi = max(screen_size.x, screen_size.y) * 2.0
+	m_LightSourceRadi = max_radi	
+	
+func Reset():
+	m_PortalUVPositions.clear()
+	m_PortalDirections.clear()
+	m_PortalWorldPositions.clear()
+	
 func _process(delta):
+	var light_source = m_CamPos + (m_LightSourceRadi * Vector2(cos(m_TotalDelta), sin(m_TotalDelta)))
+	for i in range(m_PortalDirections.size()):
+		var light_dir = m_PortalWorldPositions[i] - light_source
+		light_dir = light_dir.normalized()
+		m_PortalDirections[i] = light_dir	
+	
 	if (m_PortalUVPositions.size() > 0):
 		SetVariableShaderParameters()
 		
-		m_PortalDirections[0] = Vector2(cos(m_TotalDelta), sin(m_TotalDelta))
-		for i in range(1, m_PortalDirections.size()):
-			m_PortalDirections[i] = m_PortalDirections[0]
-		
-	m_TotalDelta += delta
-	
-func AddLightSource(light_world_pos):
-	m_LightSource = light_world_pos
+	m_TotalDelta += delta                            
 
 func AddPortal(portal_pos):
+	var screen_size = get_viewport().get_visible_rect().size
 	m_PortalWorldPositions.append(portal_pos)
 	var rand_angle = rand_range(0.0, 3.14)
 	m_PortalDirections.append(Vector2(cos(rand_angle), sin(rand_angle)))
-	var screen_size = get_viewport().get_visible_rect().size
 	var portal_uv_position = Vector2(portal_pos.x/screen_size.x, 1.0 + (portal_pos.y/screen_size.y))
 	print(portal_uv_position)
 	m_PortalUVPositions.append(portal_uv_position)
@@ -37,6 +52,7 @@ func AddPortal(portal_pos):
 	
 func SetAllShaderParameters():
 	material.set_shader_param("num_portals", m_PortalUVPositions.size())
+	material.set_shader_param("portal_width", m_PortalUVWidth)
 	
 	if (m_PortalUVPositions.size() > 0):
 		material.set_shader_param("portal_position_1", m_PortalUVPositions[0])
