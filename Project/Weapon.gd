@@ -8,8 +8,9 @@ export var OnHitDamage : int
 
 var m_OwnerPlayer
 
-func init(owner_player):
+func init(owner_player, col_mask):
 	m_OwnerPlayer = owner_player
+	collision_mask = col_mask
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -24,7 +25,7 @@ func DeactivateCollisionDetection():
 	monitoring = false
 
 func _on_Weapon_body_entered(body):
-	if body is Player && body != m_OwnerPlayer:
+	if body is Player:
 		body.OnDamage(OnHitDamage)
 		emit_signal("OnDamageInflicted", OnHitDamage, body)
 		
