@@ -34,10 +34,13 @@ func init(device, modulate_color, id):
 	collision_mask = 1 << 0
 	for x in range(PLAYER_COLLISION_LAYER_OFFSET, PLAYER_COLLISION_LAYER_OFFSET + 5): #only five enemies now
 		collision_mask += 1 << x
+		
+	var weapon_collision_mask = collision_mask - collision_layer
 	m_PlatformCollisionLayer = 1 << (1 + m_ID)
 	collision_mask += m_PlatformCollisionLayer
 	m_PlatformCollisionMask = collision_layer
-	m_Weapon.init(self)
+	
+	m_Weapon.init(self, weapon_collision_mask)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -102,6 +105,9 @@ func Statemachine_Process(delta):
 			print("Something is wrong, I can feel it")
 
 func SM_Transition(to_state):
+	match m_State:
+		STATES.HURT:
+			SM_Hurt_OnExit()
 	
 	m_PreviousState = m_State
 	m_State = to_state
@@ -168,10 +174,23 @@ func SM_Hurt(delta):
 	m_HurtFrameCounter += 1
 	if (m_HurtFrameCounter >= HurtFramePersistence):
 		m_DesiredState = STATES.IDLE
+	else:
+		var modulator = int(ceil(m_HurtFrameCounter / 8))
+		var modulator_odd_even = modulator % 2
+		if (modulator_odd_even == 1):
+			var new_col = Color(1.0 - m_ModulateColor.r, 1.0 - m_ModulateColor.g, 1.0 - m_ModulateColor.b)
+			$hip.set_modulate(new_col)
+		else:
+			$hip.set_modulate(m_ModulateColor)	
+		
 	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_Hurt_OnEnter():
 	m_HurtFrameCounter = 0
+	m_PendingHurt = false
+	
+func SM_Hurt_OnExit():
+	$hip.set_modulate(m_ModulateColor)	
 	
 func SM_FALLING(delta):
 	if (!SM_HasPendingTransition() && m_IsOnGround):
@@ -376,15 +395,6 @@ func UpdateRender(delta):
 	elif (m_Velocity.x > 0.0):
 		m_FacingRight = true
 		$hip.scale.x *= -1.0
-	
-	if (m_State == STATES.HURT):
-		var modulator =(m_HurtFrameCounter % 5 == 0)
-		var modulator_odd_even = modulator % 2
-		if (modulator_odd_even == 1):
-			var new_col = Color(1.0 - m_ModulateColor.r, 1.0 - m_ModulateColor.g, 1.0 - m_ModulateColor.b)
-			$hip.set_modulate(new_col)
-		else:
-			$hip.set_modulate(m_ModulateColor)
 			
 
 ###########################################

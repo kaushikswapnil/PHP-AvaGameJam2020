@@ -4,6 +4,8 @@ export var PlayerRes : PackedScene
 
 onready var m_Players = []
 
+onready var m_Started = false
+
 func _ready():
 	pass	
 		
@@ -33,18 +35,28 @@ func RemovePlayer(device):
 			m_Players.remove(p)
 			break
 
-
 func _on_Menu_OnStartPressed():
+	if (m_Started):
+		return
 	StartGame()
-	$Menu.visible = false
 	
-func StartGame():
+func _on_Menu_OnQuitPressed():
+	QuitGame()
+	
+func StartGame():	
+	$Menu.visible = false
 	AddPlayer(-1, false, Color(0, 0, 0))
 	var connected_pads = Input.get_connected_joypads()
 	for x in connected_pads:
 		AddPlayer(x, true, Color(rand_range(0.0, 1.0), rand_range(0.0, 1.0), rand_range(0.0, 1.0)))
 	Input.connect("joy_connection_changed", self, "_on_joy_connection_changed")
-
-
-func _on_Menu_OnQuitPressed():
+	m_Started = true
+	
+func QuitGame():
 	get_tree().quit()
+
+func _input(event):
+	if (!m_Started && (event.is_action_pressed("attack") || event.is_action_pressed("ui_accept"))):
+		StartGame()
+	elif (m_Started && (event.is_action_pressed("jump") || event.is_action_pressed("ui_cancel"))):
+		QuitGame()
