@@ -18,5 +18,5 @@ func _ready():
 
 
 func _on_Timer_timeout():
-	$Particles2D.emitting = false
+#	$Particles2D.emitting = false
 	pass # Replace with function body.
