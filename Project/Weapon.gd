@@ -10,6 +10,13 @@ export var OnHitDamage : int
 # var a = 2
 # var b = "text"
 
+var m_ComboCounter = 0
+
+func IncrementComboCounter():
+	m_ComboCounter += 1
+	
+func ResetComboCounter():
+	m_ComboCounter = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -27,3 +34,6 @@ func _on_Weapon_body_entered(body):
 	if body is Player:
 		body.OnDamage(OnHitDamage)
 		emit_signal("OnDamageInflicted", OnHitDamage, body)
+		
+func IsCollidable():
+	return monitorable && monitoring
