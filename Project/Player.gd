@@ -15,10 +15,24 @@ var m_FacingRight = true
 var m_IsOnGround = false
 
 export var PlatformRes : PackedScene
+var m_PlatformCollisionLayer
+var m_PlatformCollisionMask
 
-func init(device, modulate_color):
+onready var m_ID = -1
+
+const PLAYER_COLLISION_LAYER_OFFSET = 10
+
+func init(device, modulate_color, id):
 	m_OwnedDevice = device
 	$hip.set_modulate(modulate_color)
+	m_ID = id
+	collision_layer = 1 << (m_ID + PLAYER_COLLISION_LAYER_OFFSET)
+	collision_mask = 1 << 0
+	for x in range(PLAYER_COLLISION_LAYER_OFFSET, PLAYER_COLLISION_LAYER_OFFSET + 5): #only five enemies now
+		collision_mask += 1 << x
+	m_PlatformCollisionLayer = 1 << (1 + m_ID)
+	collision_mask += m_PlatformCollisionLayer
+	m_PlatformCollisionMask = collision_layer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -197,6 +211,9 @@ func SM_OnAttackAnimation_Ended(anim_name):
 	get_parent().add_child(new_platform)
 	new_platform.position = new_platform_position
 	new_platform.rotation_degrees = rotation_degree
+	new_platform.set_modulate($hip.get_modulate())
+	new_platform.collision_layer = m_PlatformCollisionLayer
+	new_platform.collision_mask = m_PlatformCollisionMask
 	$PlayerAnimator.disconnect("animation_finished", self, "SM_OnAttackAnimation_Ended")
 	
 ###########################################

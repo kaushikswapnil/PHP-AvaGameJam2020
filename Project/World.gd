@@ -24,7 +24,7 @@ func AddPlayer(device, randomize_pos, color):
 		new_player.global_position = $DefaultSpawnPosition.position + Vector2(rand_range(-2.0, 2.0), rand_range(-2.0, 2.0))
 	else:
 		new_player.global_position = $DefaultSpawnPosition.position
-	new_player.init(device, color)
+	new_player.init(device, color, m_Players.size() - 1)
 	
 func RemovePlayer(device):
 	for p in range(m_Players.size()):
