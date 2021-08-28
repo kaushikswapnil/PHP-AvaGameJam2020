@@ -1,27 +1,828 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=130 format=2]
 
 [ext_resource path="res://res/fonts/Kenney Future.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://addons/rmsmartshape/materials/shape_material.gd" type="Script" id=2]
 [ext_resource path="res://res/fonts/Kenney Future Narrow.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://res/Textures/MenuBackground.png" type="Texture" id=4]
 [ext_resource path="res://Menu.gd" type="Script" id=5]
+[ext_resource path="res://addons/rmsmartshape/shapes/point_array.gd" type="Script" id=6]
+[ext_resource path="res://addons/rmsmartshape/shapes/point.gd" type="Script" id=7]
+[ext_resource path="res://addons/rmsmartshape/vertex_properties.gd" type="Script" id=8]
+[ext_resource path="res://addons/rmsmartshape/shapes/shape_closed.gd" type="Script" id=9]
+[ext_resource path="res://res/Textures/BlackTexture.png" type="Texture" id=10]
+[ext_resource path="res://res/Textures/SwordClashVertical.png" type="Texture" id=11]
 
 [sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 4 )
 region_rect = Rect2( 0, 0, 603, 338 )
 
-[sub_resource type="StyleBoxFlat" id=2]
+[sub_resource type="Resource" id=2]
+script = ExtResource( 2 )
+_edge_meta_materials = [  ]
+fill_textures = [ ExtResource( 10 ) ]
+fill_texture_normals = [  ]
+fill_texture_z_index = -10
+fill_mesh_offset = 0.0
+render_offset = 0.0
+
+[sub_resource type="Resource" id=3]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=4]
+script = ExtResource( 7 )
+position = Vector2( 928.977, 75.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 3 )
+
+[sub_resource type="Resource" id=5]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=6]
+script = ExtResource( 7 )
+position = Vector2( 42.9765, 41.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 5 )
+
+[sub_resource type="Resource" id=7]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=8]
+script = ExtResource( 7 )
+position = Vector2( 50.9765, 563.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 7 )
+
+[sub_resource type="Resource" id=9]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=10]
+script = ExtResource( 7 )
+position = Vector2( 928.977, 75.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 9 )
+
+[sub_resource type="Resource" id=11]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=12]
+script = ExtResource( 7 )
+position = Vector2( 558.977, 37.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 11 )
+
+[sub_resource type="Resource" id=13]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=14]
+script = ExtResource( 7 )
+position = Vector2( 930.977, 499.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 13 )
+
+[sub_resource type="Resource" id=15]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=16]
+script = ExtResource( 7 )
+position = Vector2( 706.977, 51.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 15 )
+
+[sub_resource type="Resource" id=17]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=18]
+script = ExtResource( 7 )
+position = Vector2( 984.977, 275.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 17 )
+
+[sub_resource type="Resource" id=19]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=20]
+script = ExtResource( 7 )
+position = Vector2( 966.977, 387.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 19 )
+
+[sub_resource type="Resource" id=21]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=22]
+script = ExtResource( 7 )
+position = Vector2( 632.977, 21.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 21 )
+
+[sub_resource type="Resource" id=23]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=24]
+script = ExtResource( 7 )
+position = Vector2( 410.977, 11.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 23 )
+
+[sub_resource type="Resource" id=25]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=26]
+script = ExtResource( 7 )
+position = Vector2( 233.802, 27.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 25 )
+
+[sub_resource type="Resource" id=27]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=28]
+script = ExtResource( 7 )
+position = Vector2( 30.9765, 119.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 27 )
+
+[sub_resource type="Resource" id=29]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=30]
+script = ExtResource( 7 )
+position = Vector2( 24.9765, 281.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 29 )
+
+[sub_resource type="Resource" id=31]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=32]
+script = ExtResource( 7 )
+position = Vector2( 20.9765, 419.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 31 )
+
+[sub_resource type="Resource" id=33]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=34]
+script = ExtResource( 7 )
+position = Vector2( 190.977, 561.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 33 )
+
+[sub_resource type="Resource" id=35]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=36]
+script = ExtResource( 7 )
+position = Vector2( 312.277, 571.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 35 )
+
+[sub_resource type="Resource" id=37]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=38]
+script = ExtResource( 7 )
+position = Vector2( 130.977, 501.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 37 )
+
+[sub_resource type="Resource" id=39]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=40]
+script = ExtResource( 7 )
+position = Vector2( 236.977, 561.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 39 )
+
+[sub_resource type="Resource" id=41]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=42]
+script = ExtResource( 7 )
+position = Vector2( 414.977, 567.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 41 )
+
+[sub_resource type="Resource" id=43]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=44]
+script = ExtResource( 7 )
+position = Vector2( 570.977, 555.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 43 )
+
+[sub_resource type="Resource" id=45]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=46]
+script = ExtResource( 7 )
+position = Vector2( 726.977, 585.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 45 )
+
+[sub_resource type="Resource" id=47]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=48]
+script = ExtResource( 7 )
+position = Vector2( 484.977, 569.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 47 )
+
+[sub_resource type="Resource" id=49]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=50]
+script = ExtResource( 7 )
+position = Vector2( 846.977, 525.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 49 )
+
+[sub_resource type="Resource" id=51]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=52]
+script = ExtResource( 7 )
+position = Vector2( 964.977, 467.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 51 )
+
+[sub_resource type="Resource" id=53]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=54]
+script = ExtResource( 7 )
+position = Vector2( 992.977, 153.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 53 )
+
+[sub_resource type="Resource" id=55]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=56]
+script = ExtResource( 7 )
+position = Vector2( 988.977, 43.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 55 )
+
+[sub_resource type="Resource" id=57]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=58]
+script = ExtResource( 7 )
+position = Vector2( 92.9765, 49.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 57 )
+
+[sub_resource type="Resource" id=59]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=60]
+script = ExtResource( 7 )
+position = Vector2( 90.9765, 101.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 59 )
+
+[sub_resource type="Resource" id=61]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=62]
+script = ExtResource( 7 )
+position = Vector2( 56.9765, 179.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 61 )
+
+[sub_resource type="Resource" id=63]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=64]
+script = ExtResource( 7 )
+position = Vector2( 90.9765, 321.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 63 )
+
+[sub_resource type="Resource" id=65]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=66]
+script = ExtResource( 7 )
+position = Vector2( 74.9765, 463.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 65 )
+
+[sub_resource type="Resource" id=67]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=68]
+script = ExtResource( 7 )
+position = Vector2( 18.9765, 305.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 67 )
+
+[sub_resource type="Resource" id=69]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=70]
+script = ExtResource( 7 )
+position = Vector2( 210.977, 43.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 69 )
+
+[sub_resource type="Resource" id=71]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=72]
+script = ExtResource( 7 )
+position = Vector2( 332.977, 41.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 71 )
+
+[sub_resource type="Resource" id=73]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=74]
+script = ExtResource( 7 )
+position = Vector2( 464.977, 45.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 73 )
+
+[sub_resource type="Resource" id=75]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=76]
+script = ExtResource( 7 )
+position = Vector2( 770.977, 37.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 75 )
+
+[sub_resource type="Resource" id=77]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=78]
+script = ExtResource( 7 )
+position = Vector2( 832.977, 21.5163 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 77 )
+
+[sub_resource type="Resource" id=79]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=80]
+script = ExtResource( 7 )
+position = Vector2( 1002.98, 107.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 79 )
+
+[sub_resource type="Resource" id=81]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=82]
+script = ExtResource( 7 )
+position = Vector2( 1016.98, 187.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 81 )
+
+[sub_resource type="Resource" id=83]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=84]
+script = ExtResource( 7 )
+position = Vector2( 1010.98, 317.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 83 )
+
+[sub_resource type="Resource" id=85]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=86]
+script = ExtResource( 7 )
+position = Vector2( 906.977, 581.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 85 )
+
+[sub_resource type="Resource" id=87]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=88]
+script = ExtResource( 7 )
+position = Vector2( 1002.37, 519.516 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 87 )
+
+[sub_resource type="Resource" id=89]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=90]
+script = ExtResource( 7 )
+position = Vector2( 651.326, 547.992 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 89 )
+
+[sub_resource type="Resource" id=99]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=100]
+script = ExtResource( 7 )
+position = Vector2( 276.859, 497.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 99 )
+
+[sub_resource type="Resource" id=101]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=102]
+script = ExtResource( 7 )
+position = Vector2( 444.859, 521.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 101 )
+
+[sub_resource type="Resource" id=103]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=104]
+script = ExtResource( 7 )
+position = Vector2( 380.859, 527.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 103 )
+
+[sub_resource type="Resource" id=105]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=106]
+script = ExtResource( 7 )
+position = Vector2( 648.859, 523.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 105 )
+
+[sub_resource type="Resource" id=107]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=108]
+script = ExtResource( 7 )
+position = Vector2( 758.859, 521.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 107 )
+
+[sub_resource type="Resource" id=109]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=110]
+script = ExtResource( 7 )
+position = Vector2( 808.859, 557.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 109 )
+
+[sub_resource type="Resource" id=111]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=112]
+script = ExtResource( 7 )
+position = Vector2( 76.8592, 187.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 111 )
+
+[sub_resource type="Resource" id=113]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=114]
+script = ExtResource( 7 )
+position = Vector2( 966.859, 317.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 113 )
+
+[sub_resource type="Resource" id=115]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=116]
+script = ExtResource( 7 )
+position = Vector2( 124.859, 19.4638 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 115 )
+
+[sub_resource type="Resource" id=117]
+script = ExtResource( 8 )
+texture_idx = 0
+flip = false
+width = 1.0
+
+[sub_resource type="Resource" id=118]
+script = ExtResource( 7 )
+position = Vector2( 26.8592, 225.464 )
+point_in = Vector2( 0, 0 )
+point_out = Vector2( 0, 0 )
+properties = SubResource( 117 )
+
+[sub_resource type="Resource" id=91]
+script = ExtResource( 6 )
+_points = {
+0: SubResource( 4 ),
+1: SubResource( 6 ),
+2: SubResource( 8 ),
+3: SubResource( 10 ),
+4: SubResource( 12 ),
+5: SubResource( 14 ),
+6: SubResource( 16 ),
+7: SubResource( 18 ),
+8: SubResource( 20 ),
+9: SubResource( 22 ),
+10: SubResource( 24 ),
+11: SubResource( 26 ),
+12: SubResource( 28 ),
+13: SubResource( 30 ),
+14: SubResource( 32 ),
+15: SubResource( 34 ),
+16: SubResource( 36 ),
+17: SubResource( 38 ),
+18: SubResource( 40 ),
+19: SubResource( 42 ),
+20: SubResource( 44 ),
+21: SubResource( 46 ),
+22: SubResource( 48 ),
+23: SubResource( 50 ),
+24: SubResource( 52 ),
+25: SubResource( 54 ),
+26: SubResource( 56 ),
+27: SubResource( 58 ),
+28: SubResource( 60 ),
+29: SubResource( 62 ),
+30: SubResource( 64 ),
+31: SubResource( 66 ),
+32: SubResource( 68 ),
+33: SubResource( 70 ),
+34: SubResource( 72 ),
+35: SubResource( 74 ),
+36: SubResource( 76 ),
+37: SubResource( 78 ),
+38: SubResource( 80 ),
+39: SubResource( 82 ),
+40: SubResource( 84 ),
+41: SubResource( 86 ),
+42: SubResource( 88 ),
+43: SubResource( 90 ),
+44: SubResource( 100 ),
+45: SubResource( 102 ),
+46: SubResource( 104 ),
+47: SubResource( 106 ),
+48: SubResource( 108 ),
+49: SubResource( 110 ),
+50: SubResource( 112 ),
+51: SubResource( 114 ),
+52: SubResource( 116 ),
+53: SubResource( 118 )
+}
+_point_order = [ 3, 26, 38, 25, 39, 7, 51, 40, 8, 24, 42, 5, 41, 23, 49, 48, 21, 43, 47, 20, 22, 45, 19, 46, 16, 44, 18, 15, 17, 2, 31, 14, 30, 32, 13, 53, 50, 29, 12, 28, 1, 27, 52, 33, 11, 34, 10, 35, 4, 9, 6, 36, 37, 0 ]
+_constraints = {
+[ 0, 3 ]: 15
+}
+_next_key = 54
+
+[sub_resource type="StyleBoxFlat" id=92]
+bg_color = Color( 0.6, 0.6, 0.6, 0 )
+
+[sub_resource type="DynamicFont" id=93]
+size = 14
+font_data = ExtResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=94]
 bg_color = Color( 0.898039, 0.6, 0.0745098, 0 )
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=95]
 outline_color = Color( 0.0470588, 0.027451, 0.027451, 1 )
 font_data = ExtResource( 3 )
 
-[sub_resource type="StyleBoxFlat" id=4]
-bg_color = Color( 0.6, 0.6, 0.6, 0 )
+[sub_resource type="DynamicFont" id=96]
+size = 60
+font_data = ExtResource( 3 )
 
-[sub_resource type="DynamicFont" id=5]
-size = 14
-font_data = ExtResource( 1 )
+[sub_resource type="CanvasItemMaterial" id=97]
+blend_mode = 1
+
+[sub_resource type="ParticlesMaterial" id=98]
+render_priority = 1
+lifetime_randomness = 1.0
+emission_shape = 2
+emission_box_extents = Vector3( 2, 2, 1 )
+flag_disable_z = true
+gravity = Vector3( 0, 98, 0 )
+angular_velocity = 50.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale = 0.7
 
 [node name="Menu" type="Control"]
 anchor_right = 1.0
@@ -41,32 +842,59 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="start_button" type="Button" parent="Panel"]
-margin_left = 73.3052
-margin_top = 179.839
-margin_right = 136.305
-margin_bottom = 203.839
-rect_scale = Vector2( 5.20181, 4.08297 )
-custom_styles/normal = SubResource( 2 )
-custom_fonts/font = SubResource( 3 )
-text = "start"
-__meta__ = {
-"_edit_use_anchors_": false
+[node name="SS2D_Shape_Closed" type="Node2D" parent="Panel"]
+position = Vector2( -7.36755, -4.61963 )
+script = ExtResource( 9 )
+shape_material = SubResource( 2 )
+_points = SubResource( 91 )
+material_overrides = {
 }
 
-[node name="quit_button" type="Button" parent="Panel"]
-margin_left = 111.185
-margin_top = 277.467
-margin_right = 162.185
-margin_bottom = 301.467
+[node name="quit_button" type="Button" parent="Panel/SS2D_Shape_Closed"]
+margin_left = 291.964
+margin_top = 396.002
+margin_right = 342.964
+margin_bottom = 420.002
 rect_scale = Vector2( 6.10345, 3.88701 )
-custom_styles/normal = SubResource( 4 )
-custom_fonts/font = SubResource( 5 )
+custom_styles/normal = SubResource( 92 )
+custom_fonts/font = SubResource( 93 )
 text = "Quit"
 align = 0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[connection signal="pressed" from="Panel/start_button" to="." method="_on_start_button_pressed"]
-[connection signal="pressed" from="Panel/quit_button" to="." method="_on_end_button_pressed"]
+[node name="start_button" type="Button" parent="Panel/SS2D_Shape_Closed"]
+margin_left = 475.259
+margin_top = 276.5
+margin_right = 538.258
+margin_bottom = 300.5
+rect_scale = Vector2( 5.20181, 4.08297 )
+custom_styles/normal = SubResource( 94 )
+custom_fonts/font = SubResource( 95 )
+text = "start"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Panel/SS2D_Shape_Closed"]
+margin_left = 190.0
+margin_top = 84.0
+margin_right = 829.0
+margin_bottom = 223.0
+custom_fonts/font = SubResource( 96 )
+text = "SWORD ART OFFLINE
+      "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Particles2D" type="Particles2D" parent="Panel/SS2D_Shape_Closed"]
+material = SubResource( 97 )
+position = Vector2( 120, -16 )
+amount = 2
+process_material = SubResource( 98 )
+texture = ExtResource( 11 )
+
+[connection signal="pressed" from="Panel/SS2D_Shape_Closed/quit_button" to="." method="_on_end_button_pressed"]
+[connection signal="pressed" from="Panel/SS2D_Shape_Closed/start_button" to="." method="_on_start_button_pressed"]
