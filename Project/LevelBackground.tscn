@@ -34,7 +34,7 @@ void fragment(){
 		float dot_prod = dot(to_uv, portal_direction);
 		if (dot_prod > 0.75)
 		{
-			COLOR = vec4(1.0, 1.0, 1.0, 0.5);
+			COLOR = vec4(1.0, 1.0, 1.0, 1.0);
 		}	
 	}
 }"
