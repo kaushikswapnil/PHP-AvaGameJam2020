@@ -2,17 +2,11 @@ extends Node2D
 
 export var PlayerRes : PackedScene
 
-var m_Players = []
+onready var m_Players = []
 
 func _ready():
-	Input.connect("joy_connection_changed", self, "_on_joy_connection_changed")
-	m_Players = []
-	AddPlayer(-1, false, Color(0, 0, 0))
-	var connected_pads = Input.get_connected_joypads()
-	for x in connected_pads:
-		AddPlayer(x, true, Color(rand_range(0.0, 1.0), rand_range(0.0, 1.0), rand_range(0.0, 1.0)))
+	pass	
 		
-
 func _on_joy_connection_changed(device_id, connected):
 	if (connected):
 		var col = Color(1, 1, 1)
@@ -38,3 +32,19 @@ func RemovePlayer(device):
 			remove_child(m_Players[p])
 			m_Players.remove(p)
 			break
+
+
+func _on_Menu_OnStartPressed():
+	StartGame()
+	$Menu.visible = false
+	
+func StartGame():
+	AddPlayer(-1, false, Color(0, 0, 0))
+	var connected_pads = Input.get_connected_joypads()
+	for x in connected_pads:
+		AddPlayer(x, true, Color(rand_range(0.0, 1.0), rand_range(0.0, 1.0), rand_range(0.0, 1.0)))
+	Input.connect("joy_connection_changed", self, "_on_joy_connection_changed")
+
+
+func _on_Menu_OnQuitPressed():
+	get_tree().quit()

@@ -50,8 +50,11 @@ rect_scale = Vector2( 5.20181, 4.08297 )
 custom_styles/normal = SubResource( 2 )
 custom_fonts/font = SubResource( 3 )
 text = "start"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="end_button" type="Button" parent="Panel"]
+[node name="quit_button" type="Button" parent="Panel"]
 margin_left = 111.185
 margin_top = 277.467
 margin_right = 162.185
@@ -59,11 +62,11 @@ margin_bottom = 301.467
 rect_scale = Vector2( 6.10345, 3.88701 )
 custom_styles/normal = SubResource( 4 )
 custom_fonts/font = SubResource( 5 )
-text = "END"
+text = "Quit"
 align = 0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [connection signal="pressed" from="Panel/start_button" to="." method="_on_start_button_pressed"]
-[connection signal="pressed" from="Panel/end_button" to="." method="_on_end_button_pressed"]
+[connection signal="pressed" from="Panel/quit_button" to="." method="_on_end_button_pressed"]

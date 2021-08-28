@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://base_tileset.tres" type="TileSet" id=1]
 [ext_resource path="res://Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://World.gd" type="Script" id=3]
+[ext_resource path="res://Menu.tscn" type="PackedScene" id=4]
 
 [node name="World" type="Node2D"]
 script = ExtResource( 3 )
@@ -20,3 +21,10 @@ position = Vector2( 424.812, -123.328 )
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 509.598, -297.452 )
 current = true
+
+[node name="Menu" parent="." instance=ExtResource( 4 )]
+margin_top = -594.512
+margin_bottom = -594.512
+
+[connection signal="OnQuitPressed" from="Menu" to="." method="_on_Menu_OnQuitPressed"]
+[connection signal="OnStartPressed" from="Menu" to="." method="_on_Menu_OnStartPressed"]
