@@ -8,20 +8,11 @@ signal s_PlayAnimation(animation_track)
 const PhysicsG = preload("res://physics_globals.gd")
 
 var m_Velocity = Vector2(0, 0)
-var m_DesiredDirection = Vector2(0, 0)
 
-enum STATES { IDLE, NAVIGATION, JUMP, ATTACK, BLOCK, HURT, FALLING, DEAD }
-var m_State = STATES.IDLE
-var m_DesiredState = STATES.IDLE
-var m_PreviousState = m_State
 var m_TimeSinceLastStateChange = 0.0
 
 var m_FacingRight = true
 var m_IsOnGround = false
-
-var m_CanFire = true
-
-const JUMP_TIME = 1.2
 
 export var PlatformRes : PackedScene
 
@@ -38,24 +29,16 @@ func _physics_process(delta):
 	if (desired_velocity.y < PhysicsG.MAX_FALL_SPEED && m_State != STATES.JUMP):
 		desired_velocity += PhysicsG.GRAVITY_VEC
 		
-	if (m_DesiredDirection.length() > 0):
-		#add navigational velocity
-		if (m_State == STATES.NAVIGATION):
-			if (abs(m_Velocity.x) < PhysicsG.MAX_SPEED):
-				desired_velocity += m_DesiredDirection * min(1.0, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
-		if (m_State == STATES.JUMP):
-			if (abs(desired_velocity.x) < PhysicsG.MAX_SPEED):
-				desired_velocity += m_DesiredDirection * min(0.5, PhysicsG.MAX_SPEED - abs(desired_velocity.x))
-			desired_velocity.y -= (2.0 - m_TimeSinceLastStateChange/JUMP_TIME) * 1.0
-	elif (abs(desired_velocity.x) > 0.0 && m_IsOnGround):
-		if (abs(desired_velocity.x) < 0.01):
-			desired_velocity = PhysicsG.NULL_VECTOR
+	if (m_State == STATES.NAVIGATION):
+		if (m_DesiredIntent == ENavigationalIntent.MoveLeft):
+			desired_velocity.x = -PhysicsG.MAX_SPEED
+		elif (m_DesiredIntent == ENavigationalIntent.MoveRight):
+			desired_velocity.x = PhysicsG.MAX_SPEED
 		else:
-			desired_velocity.x = max(0.0, abs(desired_velocity.x) - min(2.0, 0.5 * abs(desired_velocity.x))) * sign(desired_velocity.x)
-		
-	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP)
+			desired_velocity.x = 0
+
+	m_Velocity = move_and_slide(desired_velocity, PhysicsG.UP, true)
 	m_IsOnGround = m_Velocity.y == 0
-	m_FacingRight = m_Velocity.x > 0
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -65,6 +48,11 @@ func _process(delta):
 	
 ###########################################
 # statemachine
+
+enum STATES { IDLE, NAVIGATION, JUMP, ATTACK, BLOCK, HURT, FALLING, DEAD }
+var m_State = STATES.IDLE
+var m_DesiredState = STATES.IDLE
+var m_PreviousState = m_State
 
 func Statemachine_Process(delta):
 	m_TimeSinceLastStateChange += delta
@@ -127,24 +115,27 @@ func SM_Idle(delta):
 func SM_Idle_OnEnter():
 	emit_signal("s_PlayAnimation", "player_idle")
 	
+onready var m_NavigationIntent = ENavigationalIntent.Idle
 func SM_Navigation(delta):
 	print("Player : Navigation")
-	if (!m_InputsProcessedThisFrame && m_Velocity.length() < 0.01):
+	if (m_DesiredState == m_State && m_DesiredIntent == ENavigationalIntent.Idle && m_Velocity.length() < 0.01):
 		m_Velocity = Vector2(0.0, 0.0)
+		m_DesiredState = STATES.IDLE
+	if (!m_IsOnGround):
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_Navigation_OnEnter():
 	emit_signal("s_PlayAnimation", "player_walk")
 	
+const JUMP_TIME = 1.2	
 func SM_Jump(delta):
 	print("Player : Jump")
-	m_DesiredDirection = PhysicsG.UP
-	if (m_TimeSinceLastStateChange >= JUMP_TIME):
-		m_DesiredState = STATES.FALLING
+	m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_Jump_OnEnter():
+	m_Velocity.y = -300.0
 	emit_signal("s_PlayAnimation", "player_jump")
 	
 func SM_Block(delta):
@@ -175,11 +166,11 @@ func SM_Attack(delta):
 		
 func SM_Attack_OnEnter():
 	m_AttackCompleted = false
-	if (m_DesiredDirection == PhysicsG.RIGHT):
+	if (m_DesiredIntent == EAttacks.A1):
 		emit_signal("s_PlayAnimation", "player_attack_1")
-	elif (m_DesiredDirection == PhysicsG.UP):
+	elif (m_DesiredIntent == EAttacks.A2):
 		emit_signal("s_PlayAnimation", "player_attack_2")
-	elif (m_DesiredDirection == PhysicsG.DOWN):
+	elif (m_DesiredIntent == EAttacks.A3):
 		emit_signal("s_PlayAnimation", "player_attack_3")
 	$PlayerAnimator.connect("animation_finished", self, "SM_OnAttackAnimation_Ended")
 	m_Weapon.connect("OnDamageInflicted", self, "SM_OnAttack_TargetHit")
@@ -224,7 +215,10 @@ func _input(event):
 	if (event is InputEventMouseButton || event is InputEventMouseMotion):
 		return
 	
-	if (m_OwnedDevice == KeyBoard && !(event is InputEventKey)):
+	if (m_OwnedDevice == KeyBoard):
+		if !(event is InputEventKey):
+			return
+	elif (m_OwnedDevice != event.device):
 		return
 		
 	if (ParseAttackInput_E(event)):
@@ -233,106 +227,75 @@ func _input(event):
 		m_TimeSinceLastInput = 0 
 		m_TimeSinceLastNavigationalInput = 0
 	return 
+	
+onready var m_DesiredIntent = 0
+onready var m_DesiredIntentStrength = 0.0
 
 func ParseInput(delta):
 	m_TimeSinceLastInput += delta
 	m_TimeSinceLastNavigationalInput += delta
 	m_InputsProcessedThisFrame = false
 	
-	if (m_OwnedDevice != InvalidDevice):
-		if (m_InputsToProcess.size() > 0):
+	if (m_InputsToProcess.size() > 0):
 			var x = m_InputsToProcess.back()
 			m_DesiredState = x[0]
-			m_DesiredDirection = x[1]
+			m_DesiredIntent = x[1]
+			m_DesiredIntentStrength = x[2]
 			m_InputsToProcess.clear()
 			m_InputsProcessedThisFrame = true
-		else:
-			m_DesiredState = m_State
-			if (m_State != STATES.NAVIGATION):
-				m_DesiredDirection = Vector2(0, 0)
-		return #Only parse input here if we dont own a device 
-	
-	if (ParseAttackInput()):
-		m_TimeSinceLastInput = 0
-		m_InputsProcessedThisFrame = true
-		return true
-	elif (ParseNavigationalInput()):
-		m_TimeSinceLastInput = 0
-		m_TimeSinceLastNavigationalInput
-		m_InputsProcessedThisFrame = true
-		return true
-	return false
+	else:
+		m_DesiredState = m_State
+
+enum ENavigationalIntent { Idle, MoveRight, MoveLeft }
 
 func ParseNavigationalInput_E(event):
 	if (m_IsOnGround):
 		if (event.is_action_pressed("jump")):
-			m_InputsToProcess.append([STATES.JUMP, PhysicsG.UP])
-			print("Jump Act Pressed")
+			m_InputsToProcess.append([STATES.JUMP, 0, 1.0])
 		elif (event.is_action_pressed("right")):
-			m_InputsToProcess.append([STATES.NAVIGATION, PhysicsG.RIGHT])
-			print("Right Act Pressed")
+			if (event is InputEventJoypadMotion):
+				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.MoveRight, event.axis_value])
+			else:
+				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.MoveRight, 1.0])
 		elif (event.is_action_pressed("left")):
-			m_InputsToProcess.append([STATES.NAVIGATION, PhysicsG.LEFT])
-			print("Left Act Pressed")
+			if (event is InputEventJoypadMotion):
+				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.MoveLeft, event.axis_value])
+			else:
+				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.MoveLeft, 1.0])
 		elif (m_State == STATES.NAVIGATION):
 			if (event.is_action_released("right") || event.is_action_released("left")):
-				m_InputsToProcess.append([STATES.NAVIGATION, PhysicsG.NULL_VECTOR])
+				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.Idle, 0.0])
 	else:
 		return false
 	return true
+	
+enum EAttacks { A1, A2, A3 }
 	
 func ParseAttackInput_E(event):
 	if (event.is_action_pressed("attack")):
-		m_InputsToProcess.append([STATES.ATTACK, PhysicsG.RIGHT])
-	elif (event.is_action_pressed("attack2")):
-		m_InputsToProcess.append([STATES.ATTACK, PhysicsG.UP])
-	elif (event.is_action_pressed("attack3")):
-		m_InputsToProcess.append([STATES.ATTACK, PhysicsG.DOWN])
-	else:
-		return false
-		
-	return true
-		
-func ParseNavigationalInput():
-	if (Input.is_action_pressed("jump") && m_IsOnGround):
-		m_DesiredState = STATES.JUMP
-		m_DesiredDirection = PhysicsG.UP
-		print("Jump Act Pressed")
-	elif (Input.is_action_pressed("right")):
-		m_DesiredState = STATES.NAVIGATION
-		m_DesiredDirection = PhysicsG.RIGHT
-		print("Right Act Pressed")
-	elif (Input.is_action_pressed("left")):
-		m_DesiredState = STATES.NAVIGATION
-		m_DesiredDirection = PhysicsG.LEFT
-		print("Left Act Pressed")
-	else:
-		return false
-	return true
-	
-func ParseAttackInput():
-	if (Input.is_action_just_pressed("attack")):
-		m_DesiredState = STATES.ATTACK
-		if (m_FacingRight):
-			m_DesiredDirection = PhysicsG.RIGHT
+		if (event.is_action_pressed("up")):
+			m_InputsToProcess.append([STATES.ATTACK, EAttacks.A2, 1.0])
+		elif (event.is_action_pressed("down")):
+			m_InputsToProcess.append([STATES.ATTACK, EAttacks.A3, 1.0])
 		else:
-			m_DesiredDirection = PhysicsG.LEFT
-		print("Attack Act Pressed")
-		return true
+			m_InputsToProcess.append([STATES.ATTACK, EAttacks.A1, 1.0])
+	else:
+		return false
 		
-	return false
+	return true
 	
 ###########################################
 # Render
 
 func UpdateRender(delta):
 	if (m_FacingRight):
+		if (m_Velocity.x < 0.0):
+			m_FacingRight = false
+			$hip.scale.x *= -1.0
+	elif (m_Velocity.x > 0.0):
+		m_FacingRight = true
 		$hip.scale.x *= -1.0
 
-
-func _on_Timer_timeout():
-	m_CanFire = true
-	
 ###########################################
 # Sound
 

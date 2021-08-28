@@ -4596,6 +4596,7 @@ tracks/46/keys = {
 
 [sub_resource type="Animation" id=10]
 length = 1.2
+loop = true
 step = 0.2
 tracks/0/type = "value"
 tracks/0/path = NodePath("hip:position")
@@ -5734,8 +5735,8 @@ texture = ExtResource( 3 )
 offset = Vector2( 2, -11 )
 
 [node name="abdomen" type="Sprite" parent="hip"]
-position = Vector2( 0.816544, -54.1098 )
-rotation = 0.123931
+position = Vector2( 4.23161, -46.9797 )
+rotation = 0.320135
 texture = ExtResource( 4 )
 offset = Vector2( 1, -20 )
 __meta__ = {
@@ -5745,7 +5746,7 @@ __meta__ = {
 
 [node name="chest" type="Sprite" parent="hip/abdomen"]
 position = Vector2( 0, -53 )
-rotation = 0.000549426
+rotation = 0.0071451
 texture = ExtResource( 7 )
 offset = Vector2( 1, -20 )
 __meta__ = {
@@ -5754,7 +5755,7 @@ __meta__ = {
 
 [node name="neck" type="Sprite" parent="hip/abdomen/chest"]
 position = Vector2( 0, -42 )
-rotation = -0.173896
+rotation = 0.0255432
 scale = Vector2( 1, 0.995272 )
 texture = ExtResource( 9 )
 offset = Vector2( 1, -20 )
@@ -5765,7 +5766,7 @@ __meta__ = {
 
 [node name="head" type="Sprite" parent="hip/abdomen/chest/neck"]
 position = Vector2( 1.68183, -51.0602 )
-rotation = -1.213
+rotation = -1.59244
 texture = ExtResource( 8 )
 offset = Vector2( 7.2157, 2.24333 )
 __meta__ = {
@@ -5811,7 +5812,7 @@ __meta__ = {
 
 [node name="arm_right" type="Sprite" parent="hip/abdomen/chest"]
 position = Vector2( -7.17755, -28.0568 )
-rotation = 0.689552
+rotation = 0.870157
 texture = ExtResource( 2 )
 offset = Vector2( 0, 40 )
 __meta__ = {
@@ -5821,7 +5822,7 @@ __meta__ = {
 
 [node name="forearm_right" type="Sprite" parent="hip/abdomen/chest/arm_right"]
 position = Vector2( 0.239098, 85.5859 )
-rotation = -0.926745
+rotation = -1.09715
 texture = ExtResource( 10 )
 offset = Vector2( 0.105103, 27.55 )
 __meta__ = {
@@ -5862,7 +5863,7 @@ __meta__ = {
 
 [node name="upper_leg_l" type="Sprite" parent="hip/lower_hip"]
 position = Vector2( 2.48206, 7.4297 )
-rotation = -0.240014
+rotation = 0.119856
 texture = ExtResource( 5 )
 offset = Vector2( 0, 60 )
 __meta__ = {
@@ -5872,7 +5873,7 @@ __meta__ = {
 
 [node name="lower_leg_l" type="Sprite" parent="hip/lower_hip/upper_leg_l"]
 position = Vector2( 0.827991, 121.997 )
-rotation = 0.693918
+rotation = 0.885627
 texture = ExtResource( 12 )
 offset = Vector2( 0, 60 )
 __meta__ = {
@@ -5881,7 +5882,7 @@ __meta__ = {
 
 [node name="feet_l" type="Sprite" parent="hip/lower_hip/upper_leg_l/lower_leg_l"]
 position = Vector2( -0.120588, 118.068 )
-rotation = -0.0373633
+rotation = -0.549828
 texture = ExtResource( 6 )
 offset = Vector2( 17.1547, -1.43872 )
 __meta__ = {
@@ -5891,14 +5892,14 @@ __meta__ = {
 
 [node name="end" type="Position2D" parent="hip/lower_hip/upper_leg_l/lower_leg_l/feet_l"]
 position = Vector2( 30.9778, -1.54086 )
-rotation = -0.395766
+rotation = -0.39835
 __meta__ = {
 "_edit_bone_": true
 }
 
 [node name="upper_leg_r" type="Sprite" parent="hip/lower_hip"]
 position = Vector2( -4.98675, 9.18739 )
-rotation = 0.696139
+rotation = -0.241742
 texture = ExtResource( 5 )
 offset = Vector2( 0, 60 )
 __meta__ = {
@@ -5908,7 +5909,7 @@ __meta__ = {
 
 [node name="lower_leg_r" type="Sprite" parent="hip/lower_hip/upper_leg_r"]
 position = Vector2( 0.827991, 121.997 )
-rotation = 0.401862
+rotation = 1.3666
 texture = ExtResource( 12 )
 offset = Vector2( 0, 60 )
 __meta__ = {
@@ -5917,7 +5918,7 @@ __meta__ = {
 
 [node name="feet_r" type="Sprite" parent="hip/lower_hip/upper_leg_r/lower_leg_r"]
 position = Vector2( -0.120588, 118.068 )
-rotation = -0.702589
+rotation = -0.225575
 texture = ExtResource( 6 )
 offset = Vector2( 17.1547, -1.43872 )
 __meta__ = {
@@ -5927,7 +5928,7 @@ __meta__ = {
 
 [node name="end" type="Position2D" parent="hip/lower_hip/upper_leg_r/lower_leg_r/feet_r"]
 position = Vector2( 30.9778, -1.54086 )
-rotation = -0.010647
+rotation = -0.499042
 __meta__ = {
 "_edit_bone_": true
 }
