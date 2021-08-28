@@ -4,6 +4,7 @@ class_name Player
 
 signal s_PlayAudio(audio_res)
 signal s_PlayAnimation(animation_track)
+signal s_StopAnimation()
 
 const PhysicsG = preload("res://physics_globals.gd")
 
@@ -167,13 +168,21 @@ func SM_Dead(delta):
 	
 onready var m_Weapon = $hip/abdomen/chest/arm_right/forearm_right/hand_right/weapon_slot/Weapon
 var m_AttackCompleted = false
+
+var m_ListenForCombo = false
+var m_QueueCombo = false
+var m_CurrentCombo = 0
+
 func SM_Attack(delta):
 	if(m_AttackCompleted):
 		m_DesiredState = STATES.IDLE	
+	if(m_ListenForCombo && Input_IsKeyPressed(EInputActionMapping.Attack)):
+		m_QueueCombo = true
 	SM_TransitionIfAny(m_DesiredState)
 		
 func SM_Attack_OnEnter():
 	m_AttackCompleted = false
+	m_CurrentCombo = 1
 	if (m_DesiredIntent == EAttacks.A1):
 		emit_signal("s_PlayAnimation", "player_attack_1")
 	elif (m_DesiredIntent == EAttacks.A2):
@@ -186,8 +195,20 @@ func SM_Attack_OnEnter():
 func SM_OnAttack_TargetHit(damage, body):
 	m_Weapon.disconnect("OnDamageInflicted", self, "SM_OnAttack_TargetHit")
 	
+func SM_OnAttack_ComboWindowStart():
+	m_ListenForCombo = true
+		
+func SM_OnAttack_ComboWindowEnd():
+	m_ListenForCombo = false
+	if(m_QueueCombo):
+		m_QueueCombo = false
+		m_CurrentCombo += 1
+		emit_signal("s_PlayAnimation", "player_attack_" + str(m_CurrentCombo))
+
 func SM_OnAttackAnimation_Ended(anim_name):
 	m_AttackCompleted = true
+	m_ListenForCombo = false
+	m_QueueCombo = false
 	var facing = Vector2(1.0, 0.0)
 	if !m_FacingRight:
 		facing *= -1.0
