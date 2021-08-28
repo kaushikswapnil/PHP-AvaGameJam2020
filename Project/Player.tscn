@@ -3489,6 +3489,23 @@ tracks/45/keys = {
 "update": 0,
 "values": [ -190.0 ]
 }
+tracks/46/type = "method"
+tracks/46/path = NodePath(".")
+tracks/46/interp = 1
+tracks/46/loop_wrap = true
+tracks/46/imported = false
+tracks/46/enabled = true
+tracks/46/keys = {
+"times": PoolRealArray( 0.17, 0.459 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [  ],
+"method": "SM_OnAttack_ComboWindowStart"
+}, {
+"args": [  ],
+"method": "SM_OnAttack_ComboWindowEnd"
+} ]
+}
 
 [sub_resource type="Animation" id=8]
 resource_name = "player_clash_2"
@@ -4045,6 +4062,23 @@ tracks/45/keys = {
 "update": 0,
 "values": [ -190.0 ]
 }
+tracks/46/type = "method"
+tracks/46/path = NodePath(".")
+tracks/46/interp = 1
+tracks/46/loop_wrap = true
+tracks/46/imported = false
+tracks/46/enabled = true
+tracks/46/keys = {
+"times": PoolRealArray( 0.17, 0.442 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [  ],
+"method": "SM_OnAttack_ComboWindowStart"
+}, {
+"args": [  ],
+"method": "SM_OnAttack_ComboWindowEnd"
+} ]
+}
 
 [sub_resource type="Animation" id=9]
 resource_name = "player_clash_3"
@@ -4600,6 +4634,23 @@ tracks/45/keys = {
 "transitions": PoolRealArray( 1 ),
 "update": 0,
 "values": [ -190.0 ]
+}
+tracks/46/type = "method"
+tracks/46/path = NodePath(".")
+tracks/46/interp = 1
+tracks/46/loop_wrap = true
+tracks/46/imported = false
+tracks/46/enabled = true
+tracks/46/keys = {
+"times": PoolRealArray( 0.17, 0.442 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [  ],
+"method": "SM_OnAttack_ComboWindowStart"
+}, {
+"args": [  ],
+"method": "SM_OnAttack_ComboWindowEnd"
+} ]
 }
 
 [sub_resource type="Animation" id=10]
@@ -8544,15 +8595,15 @@ position = Vector2( 0, -0.26 )
 shape = SubResource( 1 )
 
 [node name="hip" type="Sprite" parent="."]
-position = Vector2( 1.89544, 3.20646 )
+position = Vector2( 0.415024, 0.647009 )
 rotation = -0.0169655
 scale = Vector2( 0.1, 0.1 )
 texture = ExtResource( 3 )
 offset = Vector2( 2, -11 )
 
 [node name="abdomen" type="Sprite" parent="hip"]
-position = Vector2( 3.51423, -47.508 )
-rotation = 0.209958
+position = Vector2( 0.816574, -54.1097 )
+rotation = 0.280529
 texture = ExtResource( 4 )
 offset = Vector2( 1, -20 )
 __meta__ = {
@@ -8562,7 +8613,7 @@ __meta__ = {
 
 [node name="chest" type="Sprite" parent="hip/abdomen"]
 position = Vector2( 0, -53 )
-rotation = -0.223053
+rotation = -0.00477166
 texture = ExtResource( 7 )
 offset = Vector2( 1, -20 )
 __meta__ = {
@@ -8571,7 +8622,7 @@ __meta__ = {
 
 [node name="neck" type="Sprite" parent="hip/abdomen/chest"]
 position = Vector2( 0, -42 )
-rotation = 0.317573
+rotation = 0.157381
 scale = Vector2( 1, 0.995272 )
 texture = ExtResource( 9 )
 offset = Vector2( 1, -20 )
@@ -8591,7 +8642,7 @@ __meta__ = {
 
 [node name="arm_left" type="Sprite" parent="hip/abdomen/chest"]
 position = Vector2( 13.6077, -28.3013 )
-rotation = -0.555214
+rotation = -0.551358
 texture = ExtResource( 2 )
 offset = Vector2( 0, 40 )
 __meta__ = {
@@ -8601,7 +8652,7 @@ __meta__ = {
 
 [node name="forearm_left" type="Sprite" parent="hip/abdomen/chest/arm_left"]
 position = Vector2( 0.239098, 85.5859 )
-rotation = 1.24094
+rotation = -1.25565
 scale = Vector2( 1, 0.943666 )
 texture = ExtResource( 10 )
 offset = Vector2( 0.105103, 27.55 )
@@ -8611,7 +8662,7 @@ __meta__ = {
 
 [node name="hand_left" type="Sprite" parent="hip/abdomen/chest/arm_left/forearm_left"]
 position = Vector2( -2.03503, 68.5117 )
-rotation = 5.20003
+rotation = 4.72572
 texture = ExtResource( 11 )
 offset = Vector2( -10.9904, -1.98488 )
 __meta__ = {
@@ -8628,7 +8679,7 @@ __meta__ = {
 
 [node name="arm_right" type="Sprite" parent="hip/abdomen/chest"]
 position = Vector2( -7.17755, -28.0568 )
-rotation = 0.23249
+rotation = -0.943506
 texture = ExtResource( 2 )
 offset = Vector2( 0, 40 )
 __meta__ = {
@@ -8638,7 +8689,7 @@ __meta__ = {
 
 [node name="forearm_right" type="Sprite" parent="hip/abdomen/chest/arm_right"]
 position = Vector2( 0.239098, 85.5859 )
-rotation = -0.879148
+rotation = -0.936612
 texture = ExtResource( 10 )
 offset = Vector2( 0.105103, 27.55 )
 __meta__ = {
@@ -8647,7 +8698,7 @@ __meta__ = {
 
 [node name="hand_right" type="Sprite" parent="hip/abdomen/chest/arm_right/forearm_right"]
 position = Vector2( -2.03503, 68.5117 )
-rotation = 5.43075
+rotation = 5.30868
 texture = ExtResource( 11 )
 offset = Vector2( -10.9904, -1.98488 )
 __meta__ = {
@@ -8679,7 +8730,7 @@ __meta__ = {
 
 [node name="upper_leg_l" type="Sprite" parent="hip/lower_hip"]
 position = Vector2( 2.48206, 7.4297 )
-rotation = -0.575828
+rotation = -0.372602
 texture = ExtResource( 5 )
 offset = Vector2( 0, 60 )
 __meta__ = {
@@ -8689,7 +8740,7 @@ __meta__ = {
 
 [node name="lower_leg_l" type="Sprite" parent="hip/lower_hip/upper_leg_l"]
 position = Vector2( 0.827991, 121.997 )
-rotation = 0.947473
+rotation = 0.922295
 texture = ExtResource( 12 )
 offset = Vector2( 0, 60 )
 __meta__ = {
@@ -8698,7 +8749,7 @@ __meta__ = {
 
 [node name="feet_l" type="Sprite" parent="hip/lower_hip/upper_leg_l/lower_leg_l"]
 position = Vector2( -0.120588, 118.068 )
-rotation = -0.0165584
+rotation = -0.0373633
 texture = ExtResource( 6 )
 offset = Vector2( 17.1547, -1.43872 )
 __meta__ = {
@@ -8715,7 +8766,7 @@ __meta__ = {
 
 [node name="upper_leg_r" type="Sprite" parent="hip/lower_hip"]
 position = Vector2( -4.98675, 9.18739 )
-rotation = 0.852094
+rotation = 0.589724
 texture = ExtResource( 5 )
 offset = Vector2( 0, 60 )
 __meta__ = {
@@ -8725,7 +8776,7 @@ __meta__ = {
 
 [node name="lower_leg_r" type="Sprite" parent="hip/lower_hip/upper_leg_r"]
 position = Vector2( 0.827991, 121.997 )
-rotation = 0.519099
+rotation = 0.676891
 texture = ExtResource( 12 )
 offset = Vector2( 0, 60 )
 __meta__ = {
@@ -8734,7 +8785,7 @@ __meta__ = {
 
 [node name="feet_r" type="Sprite" parent="hip/lower_hip/upper_leg_r/lower_leg_r"]
 position = Vector2( -0.120588, 118.068 )
-rotation = -0.926794
+rotation = -0.73697
 texture = ExtResource( 6 )
 offset = Vector2( 17.1547, -1.43872 )
 __meta__ = {
