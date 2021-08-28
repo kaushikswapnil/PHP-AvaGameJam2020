@@ -159,7 +159,6 @@ config/icon="res://icon.png"
 [autoload]
 
 AudioDictionary="*res://AudioDictionary.tscn"
-AudioManager="*res://AudioManager.tscn"
 
 [debug]
 
