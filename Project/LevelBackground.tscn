@@ -6,7 +6,7 @@
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
 
-uniform int num_portals = 1
+uniform int num_portals = 1;
 
 uniform vec2 portal_position_1 = vec2(0.5, 0.5);
 uniform vec2 portal_direction_1 = vec2(0.0, 1.0);
@@ -20,14 +20,14 @@ uniform vec2 portal_direction_3 = vec2(0.0, 1.0);
 uniform vec2 portal_position_4 = vec2(0.5, 0.5);
 uniform vec2 portal_direction_4 = vec2(0.0, 1.0);
 
-bool IsWithinPortalSight(in vec2 uv_pos, in vec2 portal_pos, in vec2 portal_dir)
+bool IsWithinPortalSight(in vec2 uv_pos, in vec2 portal_position, in vec2 portal_direction, inout vec4 out_color)
 {
 	vec2 to_uv = uv_pos - portal_position;
 	
 	float to_uv_length = length(to_uv);
 	if (to_uv_length < 0.1)
 	{	
-		COLOR = vec4(1.0, 1.0, 1.0, 1.0);
+		out_color = vec4(1.0, 1.0, 1.0, 1.0);
 		return true;
 	}
 	else
@@ -35,9 +35,9 @@ bool IsWithinPortalSight(in vec2 uv_pos, in vec2 portal_pos, in vec2 portal_dir)
 		to_uv = normalize(to_uv);
 		
 		float dot_prod = dot(to_uv, portal_direction);
-		if (dot_prod > 0.75)
+		if (dot_prod > 0.85)
 		{
-			COLOR = vec4(1.0, 1.0, 1.0, 1.0);
+			out_color = vec4(1.0, 1.0, 1.0, 1.0);
 			return true;
 		}	
 	}
@@ -50,19 +50,28 @@ void fragment(){
 	switch(num_portals)
 	{
 		case 4:
-			IsWithinPortalSight(uv_pos, portal_position_4, portal_direction_4)
+			IsWithinPortalSight(uv_pos, portal_position_4, portal_direction_4, COLOR);
 		case 3:
-			IsWithinPortalSight(uv_pos, portal_position_3, portal_direction_3)
+			IsWithinPortalSight(uv_pos, portal_position_3, portal_direction_3, COLOR);
 		case 2:
-			IsWithinPortalSight(uv_pos, portal_position_2, portal_direction_2)
+			IsWithinPortalSight(uv_pos, portal_position_2, portal_direction_2, COLOR);
 		case 1:
-			IsWithinPortalSight(uv_pos, portal_position_1, portal_direction_1)
+			IsWithinPortalSight(uv_pos, portal_position_1, portal_direction_1, COLOR);
 			break;
 	}
 }"
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
+shader_param/num_portals = 1
+shader_param/portal_position_1 = Vector2( 0.5, 0.5 )
+shader_param/portal_direction_1 = Vector2( 0, 1 )
+shader_param/portal_position_2 = Vector2( 0.5, 0.5 )
+shader_param/portal_direction_2 = Vector2( 0, 1 )
+shader_param/portal_position_3 = Vector2( 0.5, 0.5 )
+shader_param/portal_direction_3 = Vector2( 0, 1 )
+shader_param/portal_position_4 = Vector2( 0.5, 0.5 )
+shader_param/portal_direction_4 = Vector2( 0, 1 )
 
 [node name="LevelBackground" type="Sprite"]
 material = SubResource( 2 )

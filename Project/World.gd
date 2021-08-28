@@ -60,7 +60,7 @@ func StartGame():
 				portal_pos.x = 0.0
 			else:
 				portal_pos.x = screen_size.x
-			portal_pos.y  = rng.randf_range(-screen_size.y, 0.0)
+			portal_pos.y  = rng.randf_range(-screen_size.y, -screen_size.y * 0.5)
 		$LevelBackground.AddPortal(portal_pos)
 	$BackGroundMusicPlayer.play()
 	#AddPlayer(-1, false, Color(0, 0, 0))
