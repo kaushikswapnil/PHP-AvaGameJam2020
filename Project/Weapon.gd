@@ -25,7 +25,7 @@ func DeactivateCollisionDetection():
 	monitoring = false
 
 func _on_Weapon_body_entered(body):
-	if body is Player:
+	if body is Player && body != m_OwnerPlayer:
 		body.OnDamage(OnHitDamage)
 		emit_signal("OnDamageInflicted", OnHitDamage, body)
 		

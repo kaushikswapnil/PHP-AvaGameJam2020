@@ -82,10 +82,8 @@ var m_PreviousState = m_State
 
 func Statemachine_Process(delta):
 	m_TimeSinceLastStateChange += delta
-	
-	if (m_Health < 0.0):
-		m_DesiredState = STATES.DEAD
-	elif m_PendingHurt:
+
+	if m_PendingHurt:
 		m_DesiredState = STATES.HURT
 	
 	match m_State:
@@ -112,6 +110,8 @@ func SM_Transition(to_state):
 	match m_State:
 		STATES.HURT:
 			SM_Hurt_OnExit()
+		STATES.DEAD:
+			SM_Dead_OnExit()
 	
 	m_PreviousState = m_State
 	m_State = to_state
@@ -128,6 +128,8 @@ func SM_Transition(to_state):
 			SM_Jump_OnEnter()
 		STATES.HURT:
 			SM_Hurt_OnEnter()
+		STATES.DEAD:
+			SM_Dead_OnEnter()
 	
 	print("Transitioning to state ", m_State)
 	
@@ -163,12 +165,8 @@ func SM_Jump(delta):
 	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_Jump_OnEnter():
-	var jump_dir = Vector2(1, 0)
-	jump_dir = jump_dir.rotated(-1.0472)
-	if (!m_FacingRight):
-		jump_dir.x *= -1.0
-	jump_dir *= 400.0
-	m_Velocity += jump_dir
+	m_Velocity.y -= 400.0
+	m_Velocity.x *= 1.5
 	emit_signal("s_PlayAnimation", "player_jump")
 	
 func SM_Block(delta):
@@ -177,9 +175,10 @@ func SM_Block(delta):
 	
 onready var m_HurtFrameCounter = 0
 const HurtFramePersistence = 180
-
 func SM_Hurt(delta):
-	print("Player : Hurt")
+	if (m_Health < 0.0):
+		m_DesiredState = STATES.DEAD
+	
 	m_HurtFrameCounter += 1
 	if (m_HurtFrameCounter >= HurtFramePersistence):
 		m_DesiredState = STATES.IDLE
@@ -206,9 +205,32 @@ func SM_FALLING(delta):
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
 	
+onready var m_DeadFramePersistence = 360
+onready var m_DeadFrameCounter = 0
+onready var m_DeathCounter = 0
 func SM_Dead(delta):
-	print("Player : Dead")
+	m_DeadFrameCounter += 1
+	if (m_DeadFrameCounter >= m_DeadFramePersistence):
+		m_DesiredState = STATES.IDLE
+	else:
+		var modulator = int(ceil(m_DeadFramePersistence / 16))
+		var modulator_odd_even = modulator % 2
+		if (modulator_odd_even == 1):
+			var new_col = Color(1.0 - m_ModulateColor.r, 1.0 - m_ModulateColor.g, 1.0 - m_ModulateColor.b)
+			$hip.set_modulate(new_col)
+		else:
+			$hip.set_modulate(m_ModulateColor)	
+	
 	SM_TransitionIfAny(m_DesiredState)
+	
+func SM_Dead_OnEnter():
+	m_DeadFrameCounter = 0
+	m_DeathCounter += 1
+	emit_signal("s_PlayAnimation", "player_rest")
+	
+func SM_Dead_OnExit():
+	m_Health = m_MaxHealth * 0.5
+	$hip.set_modulate(m_ModulateColor)
 	
 onready var m_Weapon = $hip/abdomen/chest/arm_right/forearm_right/hand_right/weapon_slot/Weapon
 var m_AttackCompleted = false
@@ -387,9 +409,9 @@ func ParseAttackInput():
 	if (Input_IsKeyPressed(EInputActionMapping.Attack)):
 		m_DesiredState = STATES.ATTACK
 		m_DesiredIntentStrength = 1.0
-		if (Input_IsInputActionEngaged(EInputActionMapping.Up)):
+		if (Input_IsInputActionEngaged(EInputActionMapping.Down)):
 			m_DesiredIntent = EAttacks.A2
-		elif (Input_IsInputActionEngaged(EInputActionMapping.Down, false) || Input_IsKeyPressed(EInputActionMapping.Down)):
+		elif (Input_IsInputActionEngaged(EInputActionMapping.Up, false) || Input_IsKeyPressed(EInputActionMapping.Up)):
 			m_DesiredIntent = EAttacks.A3
 		else:
 			m_DesiredIntent = EAttacks.A1
