@@ -11,10 +11,10 @@ func _ready():
 		
 func _on_joy_connection_changed(device_id, connected):
 	if (connected):
-		var col = Color(1, 1, 1)
-		if (m_Players.size() > 2):
-			col = Color(rand_range(0.0, 1.0), rand_range(0.0, 1.0), rand_range(0.0, 1.0))
-		AddPlayer(device_id, true, col)
+		if (m_Players.size() == 0):
+			AddPlayer(device_id, true, Color(0.0, 0.0, 0.0, 1.0))
+		elif (m_Players.size() == 1):
+			AddPlayer(device_id, true, Color(1.0, 1.0, 1.0, 1.0))		
 	else:
 		RemovePlayer(device_id)
 		
@@ -47,11 +47,16 @@ func StartGame():
 	$Menu.visible = false
 	var rand_angle = rand_range(0.0, 2 * 3.14)
 	$LevelBackground.AddPortal(Vector2(rand_range(0, 1), rand_range(0, 1)), Vector2(cos(rand_angle), sin(rand_angle)))
-	AddPlayer(-1, false, Color(0, 0, 0))
+	#AddPlayer(-1, false, Color(0, 0, 0))
 	var connected_pads = Input.get_connected_joypads()
-	for x in connected_pads:
-		AddPlayer(x, true, Color(rand_range(0.0, 1.0), rand_range(0.0, 1.0), rand_range(0.0, 1.0)))
-	Input.connect("joy_connection_changed", self, "_on_joy_connection_changed")
+	if (connected_pads.size() == 2):
+		AddPlayer(connected_pads[0], true, Color(0.0, 0.0, 0.0, 1.0))
+		AddPlayer(connected_pads[1], true, Color(1.0, 1.0, 1.0, 1.0))
+	elif (connected_pads.size() == 1):
+		AddPlayer(connected_pads[0], true, Color(0.0, 0.0, 0.0, 1.0))
+		#for x in connected_pads:
+	#	AddPlayer(x, true, Color(rand_range(0.0, 1.0), rand_range(0.0, 1.0), rand_range(0.0, 1.0)))
+		Input.connect("joy_connection_changed", self, "_on_joy_connection_changed")
 	m_Started = true
 	
 func QuitGame():
