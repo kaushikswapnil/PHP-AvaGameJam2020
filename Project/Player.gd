@@ -121,7 +121,6 @@ func SM_TransitionIfAny(to_state):
 		SM_Transition(m_DesiredState)
 	
 func SM_Idle(delta):
-	print("Player : Idle")
 	if (!m_IsOnGround):
 		m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
@@ -131,7 +130,6 @@ func SM_Idle_OnEnter():
 	
 onready var m_NavigationIntent = ENavigationalIntent.Idle
 func SM_Navigation(delta):
-	print("Player : Navigation")
 	if (m_DesiredState == m_State && m_DesiredIntent == ENavigationalIntent.Idle && m_Velocity.length() < 0.01):
 		m_Velocity = Vector2(0.0, 0.0)
 		m_DesiredState = STATES.IDLE
@@ -141,10 +139,8 @@ func SM_Navigation(delta):
 	
 func SM_Navigation_OnEnter():
 	emit_signal("s_PlayAnimation", "player_walk")
-	
-const JUMP_TIME = 1.2	
+
 func SM_Jump(delta):
-	print("Player : Jump")
 	m_DesiredState = STATES.FALLING
 	SM_TransitionIfAny(m_DesiredState)
 	
@@ -161,7 +157,6 @@ func SM_Hurt(delta):
 	SM_TransitionIfAny(m_DesiredState)
 	
 func SM_FALLING(delta):
-	print("Player : Falling")
 	if (!SM_HasPendingTransition() && m_IsOnGround):
 		m_DesiredState = STATES.IDLE
 	SM_TransitionIfAny(m_DesiredState)
@@ -173,7 +168,6 @@ func SM_Dead(delta):
 onready var m_Weapon = $hip/abdomen/chest/arm_right/forearm_right/hand_right/weapon_slot/Weapon
 var m_AttackCompleted = false
 func SM_Attack(delta):
-	print("Player : Attack")
 	if(m_AttackCompleted):
 		m_DesiredState = STATES.IDLE	
 	SM_TransitionIfAny(m_DesiredState)
@@ -223,10 +217,6 @@ onready var m_OwnedDevice = InvalidDevice
 const KeyBoard = -1
 const InvalidDevice = -2
 onready var m_TimeSinceLastInput = 0
-onready var m_TimeSinceLastNavigationalInput = 0.0
-onready var m_InputsProcessedThisFrame = false
-
-onready var m_InputsToProcess = []
 
 func _input(event):
 	if (event is InputEventMouseButton || event is InputEventMouseMotion):
@@ -237,69 +227,106 @@ func _input(event):
 			return
 	elif (m_OwnedDevice != event.device):
 		return
+	elif (event is InputEventKey): #no need to get key events in joypad players
+		return
 		
-	if (ParseAttackInput_E(event)):
-		m_TimeSinceLastInput = 0 
-	elif (ParseNavigationalInput_E(event)):
-		m_TimeSinceLastInput = 0 
-		m_TimeSinceLastNavigationalInput = 0
-	return 
+	TestInputActionForFrame(event, EInputActionMapping.Left)
+	TestInputActionForFrame(event, EInputActionMapping.Right)
+	TestInputActionForFrame(event, EInputActionMapping.Up)
+	TestInputActionForFrame(event, EInputActionMapping.Down)
+	TestInputActionForFrame(event, EInputActionMapping.Jump)
+	TestInputActionForFrame(event, EInputActionMapping.Attack)
 	
 onready var m_DesiredIntent = 0
 onready var m_DesiredIntentStrength = 0.0
 
+enum EInputActionMapping { Left, Right, Up, Down, Jump, Attack, Count }
+var m_FrameInputActionMapping = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+const m_EInputActionToNameMap = ["left", "right", "up", "down", "jump", "attack"]
+const m_EInputActionToJoyButton = [JOY_DPAD_LEFT, JOY_DPAD_RIGHT, JOY_DPAD_UP, JOY_DPAD_DOWN, JOY_DS_B, JOY_DS_Y ]
+const m_EInputActionToKey = [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACE, KEY_A ]
+const m_EInputActionToAxis = [JOY_ANALOG_LX, JOY_ANALOG_LX, JOY_ANALOG_LY , JOY_ANALOG_LY , -1, -1 ]
+
+func Input_IsKeyPressed(action):
+	return m_FrameInputActionMapping[action] != 0.0
+
+func Input_IsKeyReleased(action):
+	return m_FrameInputActionMapping[action] == 0.0
+
+func TestInputActionForFrame(event, action):
+	var action_pressed = false
+	var action_strength = 0.0
+	var action_released = false
+	if (event is InputEventKey):
+		if event.scancode == m_EInputActionToKey[action]:
+			if (event.pressed):
+				action_strength = 1.0
+				action_pressed = true
+			else:
+				action_released = true
+	elif (event is InputEventJoypadButton):
+		if (event.button_index == m_EInputActionToJoyButton[action]):
+			if (event.pressed):
+				action_pressed = true
+				action_strength = 1.0
+			else:
+				action_released = true
+	elif (event is InputEventJoypadMotion):
+		if (event.axis == m_EInputActionToAxis[action]):
+			action_strength = event.axis_value
+			action_released = true
+		
+	if (action_pressed || action_released):
+		m_FrameInputActionMapping[action] = action_strength
+		m_TimeSinceLastInput = 0.0
+		return true
+
 func ParseInput(delta):
 	m_TimeSinceLastInput += delta
-	m_TimeSinceLastNavigationalInput += delta
-	m_InputsProcessedThisFrame = false
 	
-	if (m_InputsToProcess.size() > 0):
-			var x = m_InputsToProcess.back()
-			m_DesiredState = x[0]
-			m_DesiredIntent = x[1]
-			m_DesiredIntentStrength = x[2]
-			m_InputsToProcess.clear()
-			m_InputsProcessedThisFrame = true
-	else:
-		m_DesiredState = m_State
+	if (!ParseAttackInput()):
+		ParseNavigationalInput()
+		
+func ParseNavigationalInput():
+	if (m_IsOnGround):
+		if (Input_IsKeyPressed(EInputActionMapping.Jump)):
+			m_DesiredState = STATES.JUMP
+			m_DesiredIntent = 0
+			m_DesiredIntentStrength = 1.0
+		elif (m_FrameInputActionMapping[EInputActionMapping.Right] > 0.0):
+			m_DesiredState = STATES.NAVIGATION
+			m_DesiredIntent = ENavigationalIntent.MoveRight
+			m_DesiredIntentStrength = 1.0
+		elif (m_FrameInputActionMapping[EInputActionMapping.Left] < 0.0 || Input_IsKeyPressed(EInputActionMapping.Left)):
+			m_DesiredState = STATES.NAVIGATION
+			m_DesiredIntent = ENavigationalIntent.MoveLeft
+			m_DesiredIntentStrength = 1.0
+		elif (m_State == STATES.NAVIGATION):
+			m_DesiredState = STATES.NAVIGATION
+			m_DesiredIntent = ENavigationalIntent.Idle
+			m_DesiredIntentStrength = 0.0
+		else:
+			return false
+		return true
+		
+func ParseAttackInput():
+	if (Input_IsKeyPressed(EInputActionMapping.Attack)):
+		m_DesiredState = STATES.ATTACK
+		m_DesiredIntentStrength = 1.0
+		if (m_FrameInputActionMapping[EInputActionMapping.Up] > 0.0):
+			m_DesiredIntent = EAttacks.A2
+		elif (m_FrameInputActionMapping[EInputActionMapping.Down] < 0.0 || Input_IsKeyPressed(EInputActionMapping.Down)):
+			m_DesiredIntent = EAttacks.A3
+		else:
+			m_DesiredIntent = EAttacks.A1
+		
+		return true
+	
+	return false
 
 enum ENavigationalIntent { Idle, MoveRight, MoveLeft }
-
-func ParseNavigationalInput_E(event):
-	if (m_IsOnGround):
-		if (event.is_action_pressed("jump")):
-			m_InputsToProcess.append([STATES.JUMP, 0, 1.0])
-		elif (event.is_action_pressed("right")):
-			if (event is InputEventJoypadMotion):
-				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.MoveRight, event.axis_value])
-			else:
-				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.MoveRight, 1.0])
-		elif (event.is_action_pressed("left")):
-			if (event is InputEventJoypadMotion):
-				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.MoveLeft, event.axis_value])
-			else:
-				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.MoveLeft, 1.0])
-		elif (m_State == STATES.NAVIGATION):
-			if (event.is_action_released("right") || event.is_action_released("left")):
-				m_InputsToProcess.append([STATES.NAVIGATION, ENavigationalIntent.Idle, 0.0])
-	else:
-		return false
-	return true
 	
 enum EAttacks { A1, A2, A3 }
-	
-func ParseAttackInput_E(event):
-	if (event.is_action_pressed("attack")):
-		if (event.is_action_pressed("up")):
-			m_InputsToProcess.append([STATES.ATTACK, EAttacks.A2, 1.0])
-		elif (event.is_action_pressed("down")):
-			m_InputsToProcess.append([STATES.ATTACK, EAttacks.A3, 1.0])
-		else:
-			m_InputsToProcess.append([STATES.ATTACK, EAttacks.A1, 1.0])
-	else:
-		return false
-		
-	return true
 	
 ###########################################
 # Render
