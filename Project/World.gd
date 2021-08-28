@@ -56,7 +56,7 @@ func QuitGame():
 	get_tree().quit()
 
 func _input(event):
-	if (!m_Started && (event.is_action_pressed("attack") || event.is_action_pressed("ui_accept"))):
+	if (!m_Started && (event.is_action_pressed("jump") || event.is_action_pressed("ui_accept"))):
 		StartGame()
 	elif (m_Started && (event.is_action_pressed("ui_end"))):
 		QuitGame()
