@@ -40,6 +40,7 @@ func init(device, modulate_color, id):
 	m_PlatformCollisionMask = collision_layer
 	
 	m_Weapon.init(self, weapon_collision_mask)
+	m_Weapon.set_collision_mask_bit(2, true)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
