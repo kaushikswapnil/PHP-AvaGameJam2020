@@ -13,28 +13,28 @@ particles_anim_h_frames = 1
 particles_anim_v_frames = 1
 particles_anim_loop = true
 
-[sub_resource type="Gradient" id=6]
+[sub_resource type="Gradient" id=3]
 offsets = PoolRealArray( 0, 0.0916667, 0.879167 )
 colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.490196 )
 
-[sub_resource type="GradientTexture" id=7]
-gradient = SubResource( 6 )
+[sub_resource type="GradientTexture" id=4]
+gradient = SubResource( 3 )
 
-[sub_resource type="Curve" id=8]
+[sub_resource type="Curve" id=5]
 _data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.726136 ), 0.0, 0.0, 0, 0 ]
 
-[sub_resource type="CurveTexture" id=9]
-curve = SubResource( 8 )
+[sub_resource type="CurveTexture" id=6]
+curve = SubResource( 5 )
 
-[sub_resource type="Curve" id=3]
+[sub_resource type="Curve" id=7]
 _data = [ Vector2( 0.0242347, 1 ), 0.0, 1.74148, 0, 0, Vector2( 0.957908, 0.254601 ), 0.0, 0.0, 0, 0 ]
 
-[sub_resource type="CurveTexture" id=4]
-curve = SubResource( 3 )
+[sub_resource type="CurveTexture" id=8]
+curve = SubResource( 7 )
 
-[sub_resource type="ParticlesMaterial" id=5]
+[sub_resource type="ParticlesMaterial" id=9]
 lifetime_randomness = 1.0
-trail_size_modifier = SubResource( 4 )
+trail_size_modifier = SubResource( 8 )
 emission_shape = 2
 emission_box_extents = Vector3( 25, 1, 1 )
 flag_disable_z = true
@@ -48,8 +48,8 @@ orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 angle = 1.0
 scale = 0.02
-scale_curve = SubResource( 9 )
-color_ramp = SubResource( 7 )
+scale_curve = SubResource( 6 )
+color_ramp = SubResource( 4 )
 anim_speed = 1.0
 anim_speed_random = 1.0
 anim_offset = 1.0
@@ -73,7 +73,7 @@ material = SubResource( 2 )
 position = Vector2( 0, 1 )
 amount = 300
 lifetime = 2.5
-process_material = SubResource( 5 )
+process_material = SubResource( 9 )
 texture = ExtResource( 2 )
 
 [node name="Timer" type="Timer" parent="."]
