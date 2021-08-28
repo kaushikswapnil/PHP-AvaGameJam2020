@@ -6,26 +6,29 @@
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
 
-uniform vec2 portal_position = vec2(0.5, 0.5);
-uniform vec2 portal_direction = vec2(0.0, 1.0);
+uniform int num_portals = 1
 
-void fragment(){
-	COLOR = vec4(0.0, 0.0, 0.0, 1.0);
-	
-	vec2 uv_pos = vec2(UV);
+uniform vec2 portal_position_1 = vec2(0.5, 0.5);
+uniform vec2 portal_direction_1 = vec2(0.0, 1.0);
+
+uniform vec2 portal_position_2 = vec2(0.5, 0.5);
+uniform vec2 portal_direction_2 = vec2(0.0, 1.0);
+
+uniform vec2 portal_position_3 = vec2(0.5, 0.5);
+uniform vec2 portal_direction_3 = vec2(0.0, 1.0);
+
+uniform vec2 portal_position_4 = vec2(0.5, 0.5);
+uniform vec2 portal_direction_4 = vec2(0.0, 1.0);
+
+bool IsWithinPortalSight(in vec2 uv_pos, in vec2 portal_pos, in vec2 portal_dir)
+{
 	vec2 to_uv = uv_pos - portal_position;
 	
 	float to_uv_length = length(to_uv);
 	if (to_uv_length < 0.1)
 	{	
-		float alpha = 1.0;
-		if (to_uv_length > 0.90)
-		{
-			float near_edge_factor = (to_uv_length-0.90) / 0.1;
-			alpha = 1.0 - near_edge_factor;
-		}
-		
-		COLOR = vec4(1.0, 1.0, 1.0, alpha);
+		COLOR = vec4(1.0, 1.0, 1.0, 1.0);
+		return true;
 	}
 	else
 	{
@@ -35,14 +38,31 @@ void fragment(){
 		if (dot_prod > 0.75)
 		{
 			COLOR = vec4(1.0, 1.0, 1.0, 1.0);
+			return true;
 		}	
+	}
+}
+
+void fragment(){
+	COLOR = vec4(0.0, 0.0, 0.0, 1.0);
+	
+	vec2 uv_pos = vec2(UV);
+	switch(num_portals)
+	{
+		case 4:
+			IsWithinPortalSight(uv_pos, portal_position_4, portal_direction_4)
+		case 3:
+			IsWithinPortalSight(uv_pos, portal_position_3, portal_direction_3)
+		case 2:
+			IsWithinPortalSight(uv_pos, portal_position_2, portal_direction_2)
+		case 1:
+			IsWithinPortalSight(uv_pos, portal_position_1, portal_direction_1)
+			break;
 	}
 }"
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
-shader_param/portal_position = Vector2( 0.5, 0.5 )
-shader_param/portal_direction = Vector2( 0, 1 )
 
 [node name="LevelBackground" type="Sprite"]
 material = SubResource( 2 )
