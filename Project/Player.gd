@@ -338,13 +338,7 @@ func SM_OnAttackAnimation_Ended(anim_name):
 		elif anim_name == "player_attack_3":
 			new_platform_position += (facing * 1.5) + Vector2(0.0, 80.5)
 			#rotation_degree -= 30.0
-		var new_platform = PlatformRes.instance()
-		get_parent().add_child(new_platform)
-		new_platform.position = new_platform_position
-		#new_platform.rotation_degrees = rotation_degree
-		new_platform.set_modulate(m_ModulateColor)
-		new_platform.collision_layer = m_PlatformCollisionLayer
-		new_platform.collision_mask = m_PlatformCollisionMask
+		get_parent().AddPlatformAt(new_platform_position, m_ModulateColor, m_PlatformCollisionMask, m_PlatformCollisionLayer, PlatformRes)
 	
 ###########################################
 # input

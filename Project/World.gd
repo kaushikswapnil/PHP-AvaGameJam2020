@@ -7,7 +7,7 @@ onready var m_Players = []
 onready var m_Started = false
 
 func _ready():
-	pass	
+	Input.connect("joy_connection_changed", self, "_on_joy_connection_changed")	
 	
 func _process(delta):
 	for player in m_Players:
@@ -59,9 +59,6 @@ func StartGame():
 		AddPlayer(connected_pads[1], true, Color(1.0, 1.0, 1.0, 1.0))
 	elif (connected_pads.size() == 1):
 		AddPlayer(connected_pads[0], true, Color(0.0, 0.0, 0.0, 1.0))
-		#for x in connected_pads:
-	#	AddPlayer(x, true, Color(rand_range(0.0, 1.0), rand_range(0.0, 1.0), rand_range(0.0, 1.0)))
-		Input.connect("joy_connection_changed", self, "_on_joy_connection_changed")
 	m_Started = true
 	
 func QuitGame():
@@ -69,6 +66,7 @@ func QuitGame():
 	
 func ResetLevel(respawn_players):
 	$Menu.visible = false
+	ClearAllPlatforms()
 	var screen_size = get_viewport().get_visible_rect().size
 	var rng = RandomNumberGenerator.new()
 	rng.seed = OS.get_time().second
@@ -99,3 +97,20 @@ func _input(event):
 		StartGame()
 	elif (m_Started && (event.is_action_pressed("ui_end"))):
 		QuitGame()
+		
+onready var m_Platforms = []
+func AddPlatformAt(global_pos, modulate_col, collision_m, collision_l, platform_res):
+	var new_platform = platform_res.instance()
+	add_child(new_platform)
+	m_Platforms.append(new_platform)
+	new_platform.position = global_pos
+	#new_platform.rotation_degrees = rotation_degree
+	new_platform.set_modulate(modulate_col)
+	new_platform.collision_layer = collision_l
+	new_platform.collision_mask = collision_m
+
+func ClearAllPlatforms():
+	for p in m_Platforms:
+		remove_child(p)
+		p.queue_free()
+	m_Platforms.clear()
