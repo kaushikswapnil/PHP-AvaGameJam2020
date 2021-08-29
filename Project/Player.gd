@@ -91,7 +91,7 @@ func _process(delta):
 ###########################################
 # statemachine
 
-enum STATES { IDLE, NAVIGATION, JUMP, ATTACK, BLOCK, HURT, FALLING, DEAD }
+enum STATES { IDLE, NAVIGATION, JUMP, ATTACK, BLOCK, HURT, FALLING, DEAD, TAUNT }
 var m_State = STATES.IDLE
 var m_DesiredState = STATES.IDLE
 var m_PreviousState = m_State
@@ -119,6 +119,8 @@ func Statemachine_Process(delta):
 			SM_FALLING(delta)
 		STATES.DEAD:
 			SM_Dead(delta)
+		STATES.TAUNT:
+			SM_Taunt(delta)
 		_:
 			print("Something is wrong, I can feel it")
 
@@ -128,6 +130,8 @@ func SM_Transition(to_state):
 			SM_Hurt_OnExit()
 		STATES.DEAD:
 			SM_Dead_OnExit()
+		STATES.TAUNT:
+			SM_Taunt_OnExit()
 	
 	m_PreviousState = m_State
 	m_State = to_state
@@ -146,6 +150,8 @@ func SM_Transition(to_state):
 			SM_Hurt_OnEnter()
 		STATES.DEAD:
 			SM_Dead_OnEnter()
+		STATES.TAUNT:
+			SM_Taunt_OnEnter()
 	
 	print("Transitioning to state ", m_State)
 	
@@ -340,6 +346,15 @@ func SM_OnAttackAnimation_Ended(anim_name):
 			#rotation_degree -= 30.0
 		get_parent().AddPlatformAt(new_platform_position, m_ModulateColor, m_PlatformCollisionMask, m_PlatformCollisionLayer, PlatformRes)
 	
+func SM_Taunt(delta):
+	SM_TransitionIfAny(m_DesiredState)
+	
+func SM_Taunt_OnEnter():
+	emit_signal("s_PlayAnimation", "player_taunt_1")
+	
+func SM_Taunt_OnExit():
+	emit_signal("s_StopAnimation")
+	
 ###########################################
 # input
 #
@@ -366,16 +381,17 @@ func _input(event):
 	TestInputActionForFrame(event, EInputActionMapping.Down)
 	TestInputActionForFrame(event, EInputActionMapping.Jump)
 	TestInputActionForFrame(event, EInputActionMapping.Attack)
+	TestInputActionForFrame(event, EInputActionMapping.Taunt)
 	
 onready var m_DesiredIntent = 0
 onready var m_DesiredIntentStrength = 0.0
 
-enum EInputActionMapping { Left, Right, Up, Down, Jump, Attack, Count }
-var m_FrameInputActionMapping = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-const m_EInputActionToNameMap = ["left", "right", "up", "down", "jump", "attack"]
-const m_EInputActionToJoyButton = [JOY_DPAD_LEFT, JOY_DPAD_RIGHT, JOY_DPAD_UP, JOY_DPAD_DOWN, JOY_DS_B, JOY_DS_Y ]
-const m_EInputActionToKey = [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACE, KEY_A ]
-const m_EInputActionToAxis = [JOY_ANALOG_LX, JOY_ANALOG_LX, JOY_ANALOG_LY , JOY_ANALOG_LY , -1, -1 ]
+enum EInputActionMapping { Left, Right, Up, Down, Jump, Attack, Taunt, Count }
+var m_FrameInputActionMapping = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+const m_EInputActionToNameMap = ["left", "right", "up", "down", "jump", "attack", "taunt"]
+const m_EInputActionToJoyButton = [JOY_DPAD_LEFT, JOY_DPAD_RIGHT, JOY_DPAD_UP, JOY_DPAD_DOWN, JOY_DS_B, JOY_DS_Y, JOY_DS_X ]
+const m_EInputActionToKey = [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACE, KEY_A, KEY_X ]
+const m_EInputActionToAxis = [JOY_ANALOG_LX, JOY_ANALOG_LX, JOY_ANALOG_LY , JOY_ANALOG_LY , -1, -1, -1 ]
 
 const InputDeadzone = 0.3
 func Input_IsKeyPressed(action):
@@ -424,7 +440,21 @@ func ParseInput(delta):
 	m_TimeSinceLastInput += delta
 	
 	if (!ParseAttackInput()):
-		ParseNavigationalInput()
+		if (!ParseNavigationalInput()):
+			ParseTauntInput()
+		
+func ParseTauntInput():
+	if (m_IsOnGround):
+		if (Input_IsKeyPressed(EInputActionMapping.Taunt)):
+			m_DesiredState = STATES.TAUNT
+			m_DesiredIntent = 0
+			m_DesiredIntentStrength = 1.0
+			return true
+		elif m_State == STATES.TAUNT:
+			m_DesiredState = STATES.IDLE
+			m_DesiredIntent = 0
+			m_DesiredIntentStrength = 1.0
+	return false
 		
 func ParseNavigationalInput():
 	if (m_IsOnGround):
